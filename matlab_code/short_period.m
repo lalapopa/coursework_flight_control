@@ -1,13 +1,14 @@
+clear all;
 run('data.m');
 run('omega_0_max_xi_s_max_find.m');
-FOLDER = '~/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
+FOLDER = '~/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/';
 aero_data = AeroDynamicsData;
 
 p = tf('p');
 i = 5;
 mach = calc_mach(i, 2)
 height = H_array(i)
-[m_z_a,m_z_cy,bar_M_z_alpha,bar_M_z_dot_alpha,bar_M_z_delta_v,bar_M_z_omega_z,bar_M_z_bar_omega_z,bar_Y_alpha] = moments_values(mach, height, aero_data, plane);
+%[m_z_a,m_z_cy,bar_M_z_alpha,bar_M_z_dot_alpha,bar_M_z_delta_v,bar_M_z_omega_z,bar_M_z_bar_omega_z,bar_Y_alpha] = moments_values(mach, height, aero_data, plane);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Servo motor parameters  %
@@ -23,7 +24,7 @@ W_p = 1/(T_n^2*p^2 + 2*xi_n*T_n*p + 1);
 %  FIND K_omega_z K_theta  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-epsilon = 0.25
+run('epsilon_nu_find.m');
 
 [m_z_a,m_z_cy,bar_M_z_alpha,bar_M_z_dot_alpha,bar_M_z_delta_v,bar_M_z_omega_z,bar_M_z_bar_omega_z,bar_Y_alpha] = moments_values(calc_mach, H_array, aero_data, plane);
 
@@ -34,24 +35,32 @@ q = (rho.*V.^2)/2;
 omega_0 = sqrt(-bar_M_z_alpha - bar_M_z_omega_z.*bar_Y_alpha);
 K_omega_z_gr = -(1./(bar_M_z_delta_v.*T_n));
 K_omega_z = epsilon.*K_omega_z_gr;
-K_theta = omega_0.*K_omega_z;
+K_theta = nu.*K_omega_z;
+K_omega_z_calc = max(K_omega_z);
+K_theta_calc = max(K_theta);
+
 
 csvwrite([FOLDER 'K_omega_z_all.csv'], K_omega_z);
 csvwrite([FOLDER 'K_theta_all.csv'], K_theta);
 csvwrite([FOLDER 'q_all.csv'], q);
 csvwrite([FOLDER 'H_all.csv'], H_array);
+csvwrite([FOLDER 'omega_0_pr.csv'], omega_0_H_M);
+csvwrite([FOLDER 'fine_K_omega_z.csv'], K_omega_z_calc);
+csvwrite([FOLDER 'fine_K_theta.csv'], K_theta_calc);
 
-
-%%%%%%%%%%%%%%%%
-%  A/P \theta  %
-%%%%%%%%%%%%%%%%
-
+%[m_z_a,m_z_cy,bar_M_z_alpha,bar_M_z_dot_alpha,bar_M_z_delta_v,bar_M_z_omega_z,bar_M_z_bar_omega_z,bar_Y_alpha] = moments_values(mach, height, aero_data, plane);
+%
+%omega_0 = sqrt(-bar_M_z_alpha - bar_M_z_omega_z.*bar_Y_alpha);
+%xi_k = (bar_Y_alpha - bar_M_z_omega_z - bar_M_z_dot_alpha)./(2.*omega_0);
+%%%%%%%%%%%%%%%%%
+%%  A/P \theta  %
+%%%%%%%%%%%%%%%%%
+%
 %d_omega_d_delta_v = (bar_M_z_delta_v*(p + bar_Y_alpha))/(p^2 + 2*xi_k*omega_0*p + omega_0^2); 
 %W_raz_1 = W_p*d_omega_d_delta_v;
 %W_zam_1 = feedback(W_raz_1, -K_omega_z);
-%W_raz_2 = -K_theta*W_zam_1*(1/p);
+%W_raz_2 = -K_theta(1,1)*W_zam_1*(1/p);
 %W_CL = feedback(W_raz_2, 1);
-
 
 %%%%%%%%%%%%
 %%  A/P H  %

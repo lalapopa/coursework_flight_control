@@ -11,7 +11,7 @@ plane.m = 140000;
 
 file_name = "table_2.csv";
 opts = detectImportOptions(file_name);
-opts.SelectedVariableNames = [1,5,6,7]; 
+opts.SelectedVariableNames = [1,5,6,11]; 
 csv_data = readmatrix(file_name, opts); 
 
 H_array = csv_data(:, 1) * 1000;
