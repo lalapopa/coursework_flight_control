@@ -13,7 +13,7 @@ T_1c = 1/bar_Y_alpha;
 K_omega_z_gr = -(1/(bar_M_z_delta_v*T_n));
 K_omega_z = epsilon*K_omega_z_gr;
 K_theta = nu*K_omega_z;
-K_H = h*K_theta;
+K_H = V;
 
 i_H = 0.8*(1/(T_1c*V));
 
@@ -44,7 +44,7 @@ while(~answer)
         K_omega_z = epsilon*K_omega_z_gr;
 %            K_H=h*K_v;
     end
-    if and(xi<1, xi>0.6) | xi<0.6
+    if and(xi<1, xi>0.6) || xi<0.6
 %            K_H = h*K_theta;
         K_omega_z = epsilon*K_omega_z_gr;
         K_theta = nu*K_omega_z;
