@@ -40,26 +40,33 @@ def make_simple_plot(x, y, label_text, xlabel, ylabel, limit_x=None, limit_y=Non
         limit_y[-1] = limit_y[-1] + margin_5_per 
         plt.ylim(limit_y)
 
-def generate_table_k_theta_k_omega(H, q, K_theta, K_omega): 
+def generate_table_k_theta_k_omega(H, q, K_theta, K_omega, K_H): 
     df = pd.DataFrame()
     for i, alt in enumerate(H):
         K_theta_row = get_row(K_theta, i)
         K_omega_row = get_row(K_omega, i)
+        K_H_row = get_row(K_H, i)
         q_row = get_row(q, i)
-        first_column = [str(f'$H={alt}$, м'), '$q, \\frac{кг}{м \\,с^2}$', '$K_{\\vartheta}$', '$K_{\\omega_z}$']
-        second_column = [int(q_row[0]), str('%.2f' % (K_theta_row[0])), str('%.2f' % (K_omega_row[0]))]
-        third_column = [int(q_row[1]), str('%.2f' % (K_theta_row[1])), str('%.2f' % (K_omega_row[1]))]
-        fourth_column = [int(q_row[2]), str('%.2f' % (K_theta_row[2])), str('%.2f' % (K_omega_row[2]))]
+
+        value_column_q = [
+                str(r'$q_{min}= %s \frac{кг}{м \,с^2}$' % (str(int(q_row[0])))),
+                str(r'$q_{кр}= %s \frac{кг}{м \,с^2}$' % (str(int(q_row[1])))),
+                str(r'$q_{max}= %s \frac{кг}{м \,с^2}$' % (str(int(q_row[2])))),
+                    ] 
+        value_column_1 = [str('%.2f' % (val)) for val in K_theta_row ]
+        value_column_2 = [str('%.2f' % (val)) for val in K_omega_row]
+        value_column_3 = [str('%.2f' % (val)) for val in K_H_row]
+
         chunk = {
-                r'$q_{min}$': second_column, 
-                r'$q_{кр}$': third_column, 
-                r'$q_{max}$': fourth_column,
+                r'$K_{\vartheta}$': value_column_1,
+                r'$K_{\omega_z}$': value_column_2,
+                r'$K_{H}$': value_column_3,
                 }
         df2 = pd.DataFrame(chunk)
         df2.index = pd.MultiIndex.from_tuples([
-            (str('$H=%s$, м' % (alt)), r'$q, \frac{кг}{м \,с^2}$'), 
-            (str('$H=%s$, м' % (alt)), r'$K_{\vartheta}$'), 
-            (str('$H=%s$, м' % (alt)), r'$K_{\omega_z}$')
+            (str('$H=%s$, м' % (alt)),value_column_q[0]), 
+            (str('$H=%s$, м' % (alt)),value_column_q[1]), 
+            (str('$H=%s$, м' % (alt)),value_column_q[2]),
             ])
         df = pd.concat([df, df2])
 
@@ -73,64 +80,68 @@ def get_values_by_row_column(df, row_column_index_arrays):
         value.append(df.iat[val, columns[i]])
     return value
 
+def plot_from_arrays(alts, x_values, y_values, legend_name, x_label, y_label): 
+    for i in range(0, len(alts)):
+        H = get_row(alts, i)[0]
+        y_row = get_row(y_values, i)
+        x_row = get_row(x_values, i)
+        make_simple_plot(x_row, y_row, 
+                legend_name % (H),
+                x_label, y_label,
+                )
 
+def save_figure(save_path):
+    plt.legend()
+    plt.grid()
+    plt.savefig(save_path)
+    plt.clf()
+
+
+PATH_DATA_FOLDER = 'K_theta_H_q.pgf'
 PATH_DATA_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
 FILE_NAME_H = 'H_all.csv'
 FILE_NAME_K_OMEGA_Z = 'K_omega_z_all.csv'
 FILE_NAME_K_THETA = 'K_theta_all.csv'
+FILE_NAME_K_H = 'K_H_all.csv'
 FILE_NAME_Q = 'q_all.csv'
 
 altitudes = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_H, header=None) 
 q = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_Q, header=None) 
 K_omega_z = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_K_OMEGA_Z, header=None) 
 K_theta = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_K_THETA, header=None) 
+K_H = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_K_H, header=None) 
 
 q_global_max = np.max(q.max().to_numpy())
 K_omega_z_global_max = np.max(K_omega_z.max().to_numpy())
 K_theta_global_max = np.max(K_omega_z.max().to_numpy())
 
-pos_K_omega_z = find_row_and_column_by_value(K_omega_z, K_omega_z.max())
-q_K_omega_z = get_values_by_row_column(q, pos_K_omega_z)
 
-H_array = []
-for i in range(0, len(altitudes)):
-    H = get_row(altitudes, i)[0]
-    H_array.append(H)
-    K_omega_z_row = get_row(K_omega_z, i)
-    q_row= get_row(q, i)
-    make_simple_plot(q_row, K_omega_z_row, 
-            '$K_{\\omega_z}(q), H=%s$ м' % (H),
-            '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\omega_z}$',
-            )
-
+plot_from_arrays(altitudes, q, K_omega_z, 
+        '$K_{\\omega_z}(q), H=%s$ м',
+        '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\omega_z}$'
+        )
+fine_q = np.genfromtxt(PATH_DATA_FOLDER + 'fine_q.csv', delimiter=',')
 fine_K_omega_z = np.genfromtxt(PATH_DATA_FOLDER + 'fine_K_omega_z.csv', delimiter=',')
-plt.plot(q_K_omega_z, fine_K_omega_z, 'ko--', label='$K_{\\omega_z}$ выбранное')
-plt.legend()
-plt.grid()
-plt.savefig(PATH_DATA_FOLDER + 'K_omega_z_H_q.pgf')
-plt.clf()
+plt.plot(fine_q, fine_K_omega_z, 'ko--', label='$K_{\\omega_z}$ выбранное')
+save_figure(PATH_DATA_FOLDER + 'K_omega_z_H_q.pgf')
 
-pos_K_theta = find_row_and_column_by_value(K_theta, K_theta.max())
-q_K_theta = get_values_by_row_column(q, pos_K_theta)
 
-H_array = []
-for i in range(0, len(altitudes)):
-    H = get_row(altitudes, i)[0]
-    H_array.append(H)
-    K_theta_row = get_row(K_theta, i)
-    q_row= get_row(q, i)
-    make_simple_plot(q_row, K_theta_row, 
-            '$K_{\\vartheta}(q), H=%s$ м' % (H),
-            '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\vartheta}$', 
-            )
+plot_from_arrays(altitudes, q, K_theta, 
+        '$K_{\\vartheta}(q), H=%s$ м',
+        '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\vartheta}$', 
+        )
 fine_K_theta = np.genfromtxt(PATH_DATA_FOLDER + 'fine_K_theta.csv', delimiter=',')
-plt.plot(q_K_theta, fine_K_theta, 'ko--', label='$K_{\\vartheta}$ выбранное')
-plt.legend()
-plt.grid()
-plt.savefig(PATH_DATA_FOLDER + 'K_theta_H_q.pgf')
-plt.clf()
+plt.plot(fine_q, fine_K_theta, 'ko--', label='$K_{\\vartheta}$ выбранное')
+save_figure(PATH_DATA_FOLDER + 'K_theta_H_q.pgf')
 
-H_target = H_array 
-H_indices = [i for i, val in enumerate(H_array) if val in H_target]
-#generate_table_k_theta_k_omega(H_target, q.iloc[H_indices], K_theta.iloc[H_indices], K_omega_z.iloc[H_indices])
+plot_from_arrays(altitudes, q, K_H, 
+        '$K_{H}(q), H=%s$ м',
+        '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{H}$', 
+        )
+save_figure(PATH_DATA_FOLDER + 'K_H_H_q.pgf')
+
+
+H_target = np.hstack(altitudes.to_numpy())
+H_indices = [i for i, val in enumerate(H_target) if val in H_target]
+generate_table_k_theta_k_omega(H_target, q.iloc[H_indices], K_theta.iloc[H_indices], K_omega_z.iloc[H_indices], K_H.iloc[H_indices])
 
