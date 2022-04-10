@@ -27,8 +27,8 @@ def get_row(df, i):
 def find_row_and_column_by_value(data_frame, value):
     return np.where(data_frame == value)
 
-def make_simple_plot(x, y, label_text, xlabel, ylabel, limit_x=None, limit_y=None):
-    plt.plot(x, y, 'o-', label=label_text, linewidth=4)
+def make_simple_plot(x, y, label_text, xlabel, ylabel, limit_x=None, limit_y=None, marker='o-'):
+    plt.plot(x, y, marker, label=label_text, linewidth=4, markersize=10)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     if limit_x:
@@ -81,6 +81,8 @@ def get_values_by_row_column(df, row_column_index_arrays):
     return value
 
 def plot_from_arrays(alts, x_values, y_values, legend_name, x_label, y_label): 
+    markers = [ "v", "^", "<", ">", "8", "s", "p", "P", "*", "h", "H", "+", "x", "X", "D"]
+
     for i in range(0, len(alts)):
         H = get_row(alts, i)[0]
         y_row = get_row(y_values, i)
@@ -88,6 +90,7 @@ def plot_from_arrays(alts, x_values, y_values, legend_name, x_label, y_label):
         make_simple_plot(x_row, y_row, 
                 legend_name % (H),
                 x_label, y_label,
+                marker=markers[i]+'-'
                 )
 
 def save_figure(save_path):
@@ -99,6 +102,7 @@ def save_figure(save_path):
 
 PATH_DATA_FOLDER = 'K_theta_H_q.pgf'
 PATH_DATA_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
+PATH_SAVE_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/figures/'
 FILE_NAME_H = 'H_all.csv'
 FILE_NAME_K_OMEGA_Z = 'K_omega_z_all.csv'
 FILE_NAME_K_THETA = 'K_theta_all.csv'
@@ -123,7 +127,7 @@ plot_from_arrays(altitudes, q, K_omega_z,
 fine_q = np.genfromtxt(PATH_DATA_FOLDER + 'fine_q.csv', delimiter=',')
 fine_K_omega_z = np.genfromtxt(PATH_DATA_FOLDER + 'fine_K_omega_z.csv', delimiter=',')
 plt.plot(fine_q, fine_K_omega_z, 'ko--', label='$K_{\\omega_z}$ выбранное')
-save_figure(PATH_DATA_FOLDER + 'K_omega_z_H_q.pgf')
+save_figure(PATH_SAVE_FOLDER+'K_omega_z_H_q.pgf')
 
 
 plot_from_arrays(altitudes, q, K_theta, 
@@ -132,16 +136,16 @@ plot_from_arrays(altitudes, q, K_theta,
         )
 fine_K_theta = np.genfromtxt(PATH_DATA_FOLDER + 'fine_K_theta.csv', delimiter=',')
 plt.plot(fine_q, fine_K_theta, 'ko--', label='$K_{\\vartheta}$ выбранное')
-save_figure(PATH_DATA_FOLDER + 'K_theta_H_q.pgf')
+save_figure(PATH_SAVE_FOLDER + 'K_theta_H_q.pgf')
 
 plot_from_arrays(altitudes, q, K_H, 
         '$K_{H}(q), H=%s$ м',
         '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{H}$', 
         )
-save_figure(PATH_DATA_FOLDER + 'K_H_H_q.pgf')
+save_figure(PATH_SAVE_FOLDER + 'K_H_H_q.pgf')
 
 
 H_target = np.hstack(altitudes.to_numpy())
 H_indices = [i for i, val in enumerate(H_target) if val in H_target]
-generate_table_k_theta_k_omega(H_target, q.iloc[H_indices], K_theta.iloc[H_indices], K_omega_z.iloc[H_indices], K_H.iloc[H_indices])
+#generate_table_k_theta_k_omega(H_target, q.iloc[H_indices], K_theta.iloc[H_indices], K_omega_z.iloc[H_indices], K_H.iloc[H_indices])
 
