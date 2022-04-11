@@ -7,7 +7,7 @@ def convert_to_string_with_decimal_number(array, decimal_number):
         converted.append(str(format_string % (val)))
     return converted 
 
-file_name = 'table_2.csv'
+file_name = '../data/table_2.csv'
 
 df = pd.read_csv(file_name).rename(columns={'Unnamed: 0': 'H'})
 H = df['H'].to_numpy()*1000

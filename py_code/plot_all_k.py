@@ -147,5 +147,5 @@ save_figure(PATH_SAVE_FOLDER + 'K_H_H_q.pgf')
 
 H_target = np.hstack(altitudes.to_numpy())
 H_indices = [i for i, val in enumerate(H_target) if val in H_target]
-#generate_table_k_theta_k_omega(H_target, q.iloc[H_indices], K_theta.iloc[H_indices], K_omega_z.iloc[H_indices], K_H.iloc[H_indices])
+generate_table_k_theta_k_omega(H_target, q.iloc[H_indices], K_theta.iloc[H_indices], K_omega_z.iloc[H_indices], K_H.iloc[H_indices])
 

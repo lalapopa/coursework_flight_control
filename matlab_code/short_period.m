@@ -76,12 +76,12 @@ for i = 1:c
     K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc(i), H_calc);
     K_theta_int = get_K_value(K_theta_calc, q_calc, mach_calc(i), H_calc);
 
-    [W_AP_theta, W_AP_alt] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int,...
+    [W_AP_theta, W_AP_alt, W_zam_1, W_raz_3] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int,...
         aero_data, plane, W_p);
-    W_t_latex = tf_to_latex(W_AP_theta, 3)
-    W_a_latex = tf_to_latex(W_AP_alt, 3)
-
-    
+    W_t_latex = tf_to_latex(W_AP_theta, 3);
+    W_a_latex = tf_to_latex(W_AP_alt, 3);
+    W_zam_1_latex = tf_to_latex(W_zam_1, 3);
+    W_raz_3_latex = tf_to_latex(W_raz_3, 3);
 
 end
 
@@ -94,7 +94,7 @@ function [K_value] = get_K_value(K_array, q_array,  mach, height)
 end
 
 
-function [W_AP_theta, W_AP_altitude] = get_control_system(mach, height, K_omega_z, K_theta, aero_data, plane, W_p)
+function [W_AP_theta, W_AP_altitude, W_zam_1, W_raz_3] = get_control_system(mach, height, K_omega_z, K_theta, aero_data, plane, W_p)
     [~, a, ~, rho] = atmosisa(height);
     V_target = mach.*a;
     p = tf('p');
