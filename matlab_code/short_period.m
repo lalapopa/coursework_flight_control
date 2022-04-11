@@ -38,7 +38,7 @@ for i = 1:r
     for j = 1:c
         [m_z_a,m_z_cy,bar_M_z_alpha,bar_M_z_dot_alpha,bar_M_z_delta_v,bar_M_z_omega_z,bar_M_z_bar_omega_z,bar_Y_alpha] = moments_values(calc_mach(i,j), H_array(i), aero_data, plane);
         [~, a, ~, rho] = atmosisa(H_array(i));
-        
+
         V(i, j) = calc_mach(i, j).*a;
         q(i, j) = (rho.*V(i,j).^2)/2;
         T_1c = 1/bar_Y_alpha;
@@ -76,12 +76,22 @@ for i = 1:c
     K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc(i), H_calc);
     K_theta_int = get_K_value(K_theta_calc, q_calc, mach_calc(i), H_calc);
 
-    [W_AP_theta, W_AP_alt, W_zam_1, W_raz_3] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int,...
+    [W_AP_theta, W_AP_alt, W_AP_theta_ol, W_AP_alt_ol] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int,...
         aero_data, plane, W_p);
+    
     W_t_latex = tf_to_latex(W_AP_theta, 3);
+    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
     W_a_latex = tf_to_latex(W_AP_alt, 3);
-    W_zam_1_latex = tf_to_latex(W_zam_1, 3);
-    W_raz_3_latex = tf_to_latex(W_raz_3, 3);
+    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
+    
+    data_names = [
+        string(sprintf('W_theta_ol_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_theta_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_altitude_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
+        ];
+    transfer_functions = [W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
+    run('bode_plots_analyze.m');
 
 end
 
