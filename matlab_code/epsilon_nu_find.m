@@ -20,7 +20,8 @@ function [epsilon_out, nu_out] = epsilon_nu_find(mach, alt, aero_data, plane, W_
 
     answer = false;
     while(~answer)
-        W_raz_1 = W_p*d_omega_d_delta_v;
+%        W_raz_1 = W_p*d_omega_d_delta_v;
+        W_raz_1 = d_omega_d_delta_v;
         W_zam_1 = feedback(W_raz_1, -K_omega_z);
         W_raz_2 = -K_theta*W_zam_1*(1/p);
         W_AP_theta = feedback(W_raz_2, 1);
@@ -28,19 +29,18 @@ function [epsilon_out, nu_out] = epsilon_nu_find(mach, alt, aero_data, plane, W_
         W_H_theta = K_H/(p*(1 + T_1c*p));
         W_raz_3 = i_H*W_AP_theta*W_H_theta; 
         W_AP_H = feedback(W_raz_3, 1);
-
-        [a_out, xi, T] = damp(W_AP_H);
-        xi = xi(1);
-        disp(['Try epsilon=', num2str(epsilon), 'Try nu=', num2str(nu), 'Xi_value=', num2str(xi)]);
+        [a_out, xi, T] = damp(W_raz_2);
+        xi = xi(3);
+        disp(['Try epsilon=', num2str(epsilon), ' Try nu=', num2str(nu), ' Xi_value=', num2str(xi)]);
         if(xi<=0.6)
             nu = nu-0.01;
             K_theta = nu*K_omega_z;
         end
         if(xi>=1) 
-            epsilon = epsilon - 0.01;
+            epsilon = epsilon - 0.001;
             K_omega_z = epsilon*K_omega_z_gr;
         end
-        if and(xi<1, xi>0.6) || xi < 0.6 
+        if and(xi<1, xi>0.6)
             K_omega_z = epsilon*K_omega_z_gr;
             K_theta = nu*K_omega_z;
             answer = true;

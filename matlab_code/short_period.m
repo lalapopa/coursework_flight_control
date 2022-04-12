@@ -42,7 +42,6 @@ for i = 1:r
         V(i, j) = calc_mach(i, j).*a;
         q(i, j) = (rho.*V(i,j).^2)/2;
         T_1c = 1/bar_Y_alpha;
-
         K_omega_z_gr = -(1/(bar_M_z_delta_v*T_n));
         K_omega_z(i, j) = epsilon*K_omega_z_gr;
         K_theta(i, j) = nu*K_omega_z(i,j);
@@ -54,13 +53,13 @@ end
 [K_omega_z_calc, q_calc] = get_trend_approx_values(K_omega_z, q, max(size(calc_mach)));
 K_theta_calc = get_trend_approx_values(K_theta, q, max(size(calc_mach)));
 
-
 csvwrite([FOLDER 'K_H_all.csv'], K_H);
 csvwrite([FOLDER 'K_omega_z_all.csv'], K_omega_z);
 csvwrite([FOLDER 'K_theta_all.csv'], K_theta);
 csvwrite([FOLDER 'q_all.csv'], q);
 csvwrite([FOLDER 'H_all.csv'], H_array);
 csvwrite([FOLDER 'omega_0_pr.csv'], omega_0_H_M);
+csvwrite([FOLDER 'xi_s_all.csv'], xi_s_H_M);
 csvwrite([FOLDER 'fine_K_omega_z.csv'], K_omega_z_calc);
 csvwrite([FOLDER 'fine_K_theta.csv'], K_theta_calc);
 csvwrite([FOLDER 'fine_q.csv'], q_calc);
@@ -70,7 +69,7 @@ csvwrite([FOLDER 'fine_q.csv'], q_calc);
 %%%%%%%%%%%%%%%%%%%%
 H_calc = 10000; % Level flight
 mach_calc = return_element_in_another_matrix(H_array, H_calc, calc_mach);
-[r, c] = size(mach_calc)
+[r, c] = size(mach_calc);
 
 for i = 1:c
     K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc(i), H_calc);
@@ -79,16 +78,22 @@ for i = 1:c
     [W_AP_theta, W_AP_alt, W_AP_theta_ol, W_AP_alt_ol] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int,...
         aero_data, plane, W_p);
     
-    W_t_latex = tf_to_latex(W_AP_theta, 3);
-    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
-    W_a_latex = tf_to_latex(W_AP_alt, 3);
-    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
+    W_t_latex = tf_to_latex(W_AP_theta, 3)
+    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3)
+    W_a_latex = tf_to_latex(W_AP_alt, 3)
+    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3)
     
     data_names = [
         string(sprintf('W_theta_ol_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_theta_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_altitude_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f', H_calc, mach_calc(i)*10000)),...
+        ];
+    data_names_bode_stats = [
+        string(sprintf('W_theta_ol_H_%i_M_0_%4.0f_stats', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_theta_H_%i_M_0_%4.0f_stats', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_altitude_H_%i_M_0_%4.0f_stats', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f_stats', H_calc, mach_calc(i)*10000)),...
         ];
     transfer_functions = [W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
     run('bode_plots_analyze.m');

@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
+import config
 
 matplotlib.rcParams.update(matplotlib.rcParamsDefault)
 matplotlib.use("pgf")
@@ -100,20 +101,12 @@ def save_figure(save_path):
     plt.clf()
 
 
-PATH_DATA_FOLDER = 'K_theta_H_q.pgf'
-PATH_DATA_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
-PATH_SAVE_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/figures/'
-FILE_NAME_H = 'H_all.csv'
-FILE_NAME_K_OMEGA_Z = 'K_omega_z_all.csv'
-FILE_NAME_K_THETA = 'K_theta_all.csv'
-FILE_NAME_K_H = 'K_H_all.csv'
-FILE_NAME_Q = 'q_all.csv'
 
-altitudes = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_H, header=None) 
-q = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_Q, header=None) 
-K_omega_z = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_K_OMEGA_Z, header=None) 
-K_theta = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_K_THETA, header=None) 
-K_H = pd.read_csv(PATH_DATA_FOLDER + FILE_NAME_K_H, header=None) 
+altitudes = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_H, header=None) 
+q = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_Q, header=None) 
+K_omega_z = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_K_OMEGA_Z, header=None) 
+K_theta = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_K_THETA, header=None) 
+K_H = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_K_H, header=None) 
 
 q_global_max = np.max(q.max().to_numpy())
 K_omega_z_global_max = np.max(K_omega_z.max().to_numpy())
@@ -124,25 +117,25 @@ plot_from_arrays(altitudes, q, K_omega_z,
         '$K_{\\omega_z}(q), H=%s$ м',
         '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\omega_z}$'
         )
-fine_q = np.genfromtxt(PATH_DATA_FOLDER + 'fine_q.csv', delimiter=',')
-fine_K_omega_z = np.genfromtxt(PATH_DATA_FOLDER + 'fine_K_omega_z.csv', delimiter=',')
+fine_q = np.genfromtxt(config.PATH_DATA_FOLDER + 'fine_q.csv', delimiter=',')
+fine_K_omega_z = np.genfromtxt(config.PATH_DATA_FOLDER + 'fine_K_omega_z.csv', delimiter=',')
 plt.plot(fine_q, fine_K_omega_z, 'ko--', label='$K_{\\omega_z}$ выбранное')
-save_figure(PATH_SAVE_FOLDER+'K_omega_z_H_q.pgf')
+save_figure(config.PATH_SAVE_FOLDER+'K_omega_z_H_q.pgf')
 
 
 plot_from_arrays(altitudes, q, K_theta, 
         '$K_{\\vartheta}(q), H=%s$ м',
         '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\vartheta}$', 
         )
-fine_K_theta = np.genfromtxt(PATH_DATA_FOLDER + 'fine_K_theta.csv', delimiter=',')
+fine_K_theta = np.genfromtxt(config.PATH_DATA_FOLDER + 'fine_K_theta.csv', delimiter=',')
 plt.plot(fine_q, fine_K_theta, 'ko--', label='$K_{\\vartheta}$ выбранное')
-save_figure(PATH_SAVE_FOLDER + 'K_theta_H_q.pgf')
+save_figure(config.PATH_SAVE_FOLDER + 'K_theta_H_q.pgf')
 
 plot_from_arrays(altitudes, q, K_H, 
         '$K_{H}(q), H=%s$ м',
         '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{H}$', 
         )
-save_figure(PATH_SAVE_FOLDER + 'K_H_H_q.pgf')
+save_figure(config.PATH_SAVE_FOLDER + 'K_H_H_q.pgf')
 
 
 H_target = np.hstack(altitudes.to_numpy())

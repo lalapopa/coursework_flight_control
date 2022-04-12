@@ -2,7 +2,7 @@ mach = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
 plane.bar_x_t = 0.45;
 plane.I_z = 19*10^6;
 plane.S = 300;
-plane.b_a = 7.5;
+plane.b_a = 6.436;
 plane.m = 140000;
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -21,5 +21,4 @@ M_lf = csv_data(:, 4);
 calc_mach = [M_min M_lf M_max];
 to_delete = {'file_name','opts','csv_data', 'vars'};
 clear(to_delete{:});
-
 

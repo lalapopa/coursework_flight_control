@@ -22,19 +22,18 @@ def add_text_to_array_cell(matrix, add_text, row_pos, column_pos):
             new_list.append(row)
     return new_list 
 
-omega_0 = pd.read_csv(config.PATH_DATA_FOLDER+config.FILE_OMEGA_0_PR, header=None)
-omega_0_max = max(omega_0.iloc[:, -1].to_numpy())
+xi_s = pd.read_csv(config.PATH_DATA_FOLDER+config.FILE_XI_S, header=None)
+xi_s_max = max(xi_s.iloc[:, -1].to_numpy())
 
-omega_0 = omega_0.iloc[: , :-1]
-omega_0_max_position = find_row_and_column_by_value(omega_0, omega_0_max) 
-omega_0_array = omega_0.to_numpy()
+xi_s = xi_s.iloc[: , :-1]
+xi_s_max_position = find_row_and_column_by_value(xi_s, xi_s_max) 
+xi_s_array = xi_s.to_numpy()
 
 text_to_add = "\\cellcolor{green}"
-new_table = add_text_to_array_cell(omega_0_array, text_to_add, omega_0_max_position[0], omega_0_max_position[1])
+new_table = add_text_to_array_cell(xi_s_array, text_to_add, xi_s_max_position[0], xi_s_max_position[1])
 
 H = pd.read_csv(config.PATH_DATA_FOLDER+config.FILE_H, header=None)
 output_df = pd.DataFrame(new_table)
 output_df = pd.concat([H, output_df], axis=1)
 print(output_df.to_latex(escape=False, index=False))
-
 

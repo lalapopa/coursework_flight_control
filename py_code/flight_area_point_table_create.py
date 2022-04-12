@@ -1,4 +1,5 @@
 import pandas as pd
+import config
 
 def convert_to_string_with_decimal_number(array, decimal_number):
     converted = []
@@ -7,9 +8,8 @@ def convert_to_string_with_decimal_number(array, decimal_number):
         converted.append(str(format_string % (val)))
     return converted 
 
-file_name = '../data/table_2.csv'
 
-df = pd.read_csv(file_name).rename(columns={'Unnamed: 0': 'H'})
+df = pd.read_csv(config.PATH_DATA_FOLDER+config.FILE_TABLE_2).rename(columns={'Unnamed: 0': 'H'})
 H = df['H'].to_numpy()*1000
 M_min = df['M_min'].to_numpy()
 M_max = df['M_max'].to_numpy()
