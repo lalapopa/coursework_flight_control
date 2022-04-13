@@ -79,10 +79,10 @@ for i = 1:c
     [W_AP_theta, W_AP_alt, W_AP_theta_ol, W_AP_alt_ol] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int,...
         aero_data, plane, W_p);
     
-    W_t_latex = tf_to_latex(W_AP_theta, 3)
-    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3)
-    W_a_latex = tf_to_latex(W_AP_alt, 3)
-    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3)
+    W_t_latex = tf_to_latex(W_AP_theta, 3);
+    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
+    W_a_latex = tf_to_latex(W_AP_alt, 3);
+    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
     
     data_names = [
         string(sprintf('W_theta_ol_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
