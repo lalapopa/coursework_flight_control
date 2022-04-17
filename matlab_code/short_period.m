@@ -57,6 +57,7 @@ K_theta_calc = get_trend_approx_values(K_theta, q, max(size(calc_mach)));
 csvwrite([FOLDER 'K_H_all.csv'], K_H);
 csvwrite([FOLDER 'K_omega_z_all.csv'], K_omega_z);
 csvwrite([FOLDER 'K_theta_all.csv'], K_theta);
+csvwrite([FOLDER 'i_H_all.csv'], i_H);
 csvwrite([FOLDER 'q_all.csv'], q);
 csvwrite([FOLDER 'H_all.csv'], H_array);
 csvwrite([FOLDER 'omega_0_pr.csv'], omega_0_H_M);
@@ -76,29 +77,30 @@ for i = 1:c
     K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc(i), H_calc);
     K_theta_int = get_K_value(K_theta_calc, q_calc, mach_calc(i), H_calc);
 
-    [W_AP_theta, W_AP_alt, W_AP_theta_ol, W_AP_alt_ol] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int,...
-        aero_data, plane, W_p);
-    
-    W_t_latex = tf_to_latex(W_AP_theta, 3);
+    [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int, aero_data, plane, W_p);
+
+    W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3);
+    W_t_latex = tf_to_latex(W_AP_theta, 3)
     W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
     W_a_latex = tf_to_latex(W_AP_alt, 3);
     W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
     
     data_names = [
+        string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_theta_ol_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_theta_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_altitude_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
         ];
     data_names_bode_stats = [
+        string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_theta_ol_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_theta_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_altitude_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
         string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
         ];
-    transfer_functions = [W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
+    transfer_functions = [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
     run('bode_plots_analyze.m');
-
 end
 
 function [K_value] = get_K_value(K_array, q_array,  mach, height)
@@ -109,8 +111,7 @@ function [K_value] = get_K_value(K_array, q_array,  mach, height)
     K_value = interp1(q_array(ind), K_array(ind), q_target,'linear');
 end
 
-
-function [W_AP_theta, W_AP_altitude, W_zam_1, W_raz_3] = get_control_system(mach, height, K_omega_z, K_theta, aero_data, plane, W_p)
+function [W_raz_1, W_raz_2, W_AP_theta, W_raz_3, W_AP_altitude] = get_control_system(mach, height, K_omega_z, K_theta, aero_data, plane, W_p)
     [~, a, ~, rho] = atmosisa(height);
     V_target = mach.*a;
     p = tf('p');
@@ -129,21 +130,28 @@ function [W_AP_theta, W_AP_altitude, W_zam_1, W_raz_3] = get_control_system(mach
     K_H = V_target;
     i_H = 0.8*(1/(T_1c*V_target));
 
-    has_overshoot = true;
-    while has_overshoot
-        W_H_theta = (K_H)/(p*(1 + T_1c*p));
-        W_raz_3 = i_H*W_AP_theta*W_H_theta;
-        W_AP_altitude = feedback(W_raz_3, 1);
-        W_AP_H_step_info = stepinfo(W_AP_altitude);
-        if W_AP_H_step_info.Overshoot == 0
-            has_overshoot = false;
-        else 
-            K_H = K_H - 1;
-        end
-    end
+    W_H_theta = (K_H)/(p*(1 + T_1c*p));
+    W_raz_3 = i_H*W_AP_theta*W_H_theta;
+    W_AP_altitude = feedback(W_raz_3, 1);
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %  FIND K_H where no overshoot  %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    has_overshoot = true;
+%    while has_overshoot
+%        W_H_theta = (K_H)/(p*(1 + T_1c*p));
+%        W_raz_3 = i_H*W_AP_theta*W_H_theta;
+%        W_AP_altitude = feedback(W_raz_3, 1);
+    W_AP_H_step_info = stepinfo(W_AP_altitude);
+%        if W_AP_H_step_info.Overshoot == 0
+%            has_overshoot = false;
+%        else 
+%            K_H = K_H - 1;
+%        end
+%    end
     disp(['MACH CALC = ' num2str(mach)])
     disp(['overshoot= ', num2str(W_AP_H_step_info.Overshoot), ', K_H= ' ,num2str(K_H)]);
-    disp(['K_H_method/K_H_my= ', num2str(V_target/K_H), '\n']);
+    disp(['K_H_method/K_H_my= ', num2str(V_target/K_H)]);
 end
 
 function latex_string = tf_to_latex(tf_, decimal)

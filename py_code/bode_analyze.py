@@ -35,7 +35,7 @@ class BodeNames:
     def __init__(self, names):
         self.names = names
     def __iter__(self):
-        tf_names = ['W_theta_ol_H', 'W_theta_H', 'W_altitude_H', 'W_altitude_ol_H']
+        tf_names = ['W_theta_ol_H', 'W_theta_H', 'W_altitude_H', 'W_altitude_ol_H', 'W_core_damp_ol_H']
         for re_trigger in tf_names:
             r = re.compile(re_trigger)
             transfer_functions_names= list(filter(r.match, self.names))
@@ -139,7 +139,7 @@ for i, tf in enumerate(bode_names):
             config.PATH_DATA_BODE_FOLDER+tf['margin_values']
             )
     try:
-        bandwidth = round(find_bandwidth_freq(mag, freq))
+        bandwidth = str(np.format_float_positional(find_bandwidth_freq(mag, freq), precision=3))
     except TypeError:
         bandwidth = '-'
 
