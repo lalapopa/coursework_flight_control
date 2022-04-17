@@ -80,9 +80,9 @@ for i = 1:c
     [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int, aero_data, plane, W_p);
 
     W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3);
-    W_t_latex = tf_to_latex(W_AP_theta, 3)
+    W_t_latex = tf_to_latex(W_AP_theta, 3);
     W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
-    W_a_latex = tf_to_latex(W_AP_alt, 3);
+    W_a_latex = tf_to_latex(W_AP_alt, 3)
     W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
     
     data_names = [
