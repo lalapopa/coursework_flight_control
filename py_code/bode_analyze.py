@@ -197,8 +197,7 @@ def filter_gain_phase_margins(gain_margin, gain_freq, phase_margin, phase_freq):
             gain_freq = np.delete(gain_freq, i)
     return gain_margin, gain_freq, phase_margin, phase_freq
 
-bode_names = BodeNames(file_names)
-
+bode_names = BodeNames(sorted(file_names))
 three_plots = 0
 column_M = []
 column_bw = []
@@ -242,7 +241,7 @@ for i, tf in enumerate(bode_names):
 
     if three_plots == 2:
         set_plot_decoration(ax)
-#        fig.savefig(config.PATH_SAVE_FOLDER+file_name)
+        fig.savefig(config.PATH_SAVE_FOLDER+file_name)
         fig.clf()
         plt.close(fig)
         fig, ax = plt.subplots(2, sharex=True)
@@ -255,5 +254,3 @@ for i, tf in enumerate(bode_names):
         
     else:
         three_plots += 1
-    
-
