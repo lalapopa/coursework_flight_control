@@ -1,7 +1,10 @@
-PATH_DATA_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
-PATH_SAVE_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/figures/'
-PATH_DATA_BODE_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/bode/' 
-PATH_REPORT_FOLDER = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/'
+PATH_DATA = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
+PATH_SAVE = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/figures/'
+PATH_REPORT = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/'
+
+PATH_DATA_BODE = 'bode/' 
+PATH_DATA_MODEL = 'model_result/' 
+
 
 FILE_OMEGA_0_PR= 'omega_0_pr.csv'
 FILE_H = 'H_all.csv'

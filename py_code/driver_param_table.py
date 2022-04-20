@@ -22,7 +22,7 @@ def add_text_to_array_cell(matrix, add_text, row_pos, column_pos):
             new_list.append(row)
     return new_list 
 
-omega_0 = pd.read_csv(config.PATH_DATA_FOLDER+config.FILE_OMEGA_0_PR, header=None)
+omega_0 = pd.read_csv(config.PATH_DATA+config.FILE_OMEGA_0_PR, header=None)
 omega_0_max = max(omega_0.iloc[:, -1].to_numpy())
 
 omega_0 = omega_0.iloc[: , :-1]
@@ -32,7 +32,7 @@ omega_0_array = omega_0.to_numpy()
 text_to_add = "\\cellcolor{green}"
 new_table = add_text_to_array_cell(omega_0_array, text_to_add, omega_0_max_position[0], omega_0_max_position[1])
 
-H = pd.read_csv(config.PATH_DATA_FOLDER+config.FILE_H, header=None)
+H = pd.read_csv(config.PATH_DATA+config.FILE_H, header=None)
 output_df = pd.DataFrame(new_table)
 output_df = pd.concat([H, output_df], axis=1)
 print(output_df.to_latex(escape=False, index=False))

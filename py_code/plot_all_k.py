@@ -151,12 +151,12 @@ def save_figure(save_path):
 
 
 
-altitudes = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_H, header=None) 
-q = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_Q, header=None) 
-K_omega_z = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_K_OMEGA_Z, header=None) 
-K_theta = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_K_THETA, header=None) 
-K_H = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_K_H, header=None) 
-i_H = pd.read_csv(config.PATH_DATA_FOLDER + config.FILE_i_H, header=None) 
+altitudes = pd.read_csv(config.PATH_DATA + config.FILE_H, header=None) 
+q = pd.read_csv(config.PATH_DATA + config.FILE_Q, header=None) 
+K_omega_z = pd.read_csv(config.PATH_DATA + config.FILE_K_OMEGA_Z, header=None) 
+K_theta = pd.read_csv(config.PATH_DATA + config.FILE_K_THETA, header=None) 
+K_H = pd.read_csv(config.PATH_DATA + config.FILE_K_H, header=None) 
+i_H = pd.read_csv(config.PATH_DATA + config.FILE_i_H, header=None) 
 
 q_global_max = np.max(q.max().to_numpy())
 K_omega_z_global_max = np.max(K_omega_z.max().to_numpy())
@@ -167,23 +167,23 @@ plot_from_arrays(altitudes, q, K_omega_z,
         '$K_{\\omega_z}(q), H=%s$ м',
         '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\omega_z}$'
         )
-fine_q = np.genfromtxt(config.PATH_DATA_FOLDER + 'fine_q.csv', delimiter=',')
-fine_K_omega_z = np.genfromtxt(config.PATH_DATA_FOLDER + 'fine_K_omega_z.csv', delimiter=',')
+fine_q = np.genfromtxt(config.PATH_DATA + 'fine_q.csv', delimiter=',')
+fine_K_omega_z = np.genfromtxt(config.PATH_DATA + 'fine_K_omega_z.csv', delimiter=',')
 plt.plot(fine_q, fine_K_omega_z, 'ko--', label='$K_{\\omega_z}$ выбранное')
 
 if '-s' in input_argv:
-    save_figure(config.PATH_SAVE_FOLDER+'K_omega_z_H_q.pgf')
+    save_figure(config.PATH_SAVE+'K_omega_z_H_q.pgf')
 
 
 plot_from_arrays(altitudes, q, K_theta, 
         '$K_{\\vartheta}(q), H=%s$ м',
         '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{\\vartheta}$', 
         )
-fine_K_theta = np.genfromtxt(config.PATH_DATA_FOLDER + 'fine_K_theta.csv', delimiter=',')
+fine_K_theta = np.genfromtxt(config.PATH_DATA + 'fine_K_theta.csv', delimiter=',')
 plt.plot(fine_q, fine_K_theta, 'ko--', label='$K_{\\vartheta}$ выбранное')
 
 if '-s' in input_argv:
-    save_figure(config.PATH_SAVE_FOLDER + 'K_theta_H_q.pgf')
+    save_figure(config.PATH_SAVE + 'K_theta_H_q.pgf')
 
 plot_from_arrays(altitudes, q, K_H, 
         '$K_{H}(q), H=%s$ м',
@@ -191,14 +191,14 @@ plot_from_arrays(altitudes, q, K_H,
         )
 
 if '-s' in input_argv:
-    save_figure(config.PATH_SAVE_FOLDER + 'K_H_H_q.pgf')
+    save_figure(config.PATH_SAVE + 'K_H_H_q.pgf')
 
 if '-t' in input_argv:
     H_target = np.hstack(altitudes.to_numpy())
     H_indices = [i for i, val in enumerate(H_target) if val in H_target]
     latex_table = generate_table_k_theta_k_omega(H_target, q.iloc[H_indices], K_theta.iloc[H_indices], K_omega_z.iloc[H_indices], K_H.iloc[H_indices], i_H.iloc[H_indices])
 
-    file_name = config.PATH_REPORT_FOLDER+'table_coeffs.tex'
+    file_name = config.PATH_REPORT+'table_coeffs.tex'
     save_string_to_file(latex_table, file_name)
     print(f'Saved table in {file_name}')
 

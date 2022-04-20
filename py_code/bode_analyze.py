@@ -29,7 +29,7 @@ r"\usepackage[english,russian]{babel}",
 }
 )
 
-file_names = os.listdir(config.PATH_DATA_BODE_FOLDER)
+file_names = os.listdir(config.PATH_DATA+config.PATH_DATA_BODE)
 
 class BodeNames:
     def __init__(self, names):
@@ -44,7 +44,7 @@ class BodeNames:
                     continue
                 mach_number = self.__get_mach_number(tf)
                 stats_file = re.sub(r'\.', '_stats.', tf)
-                
+
                 yield {
                         'bode_values': tf,
                         'margin_values': stats_file,
@@ -209,9 +209,9 @@ for i, tf in enumerate(bode_names):
     print(f'open {tf["bode_values"]}')
 
 
-    mag, phs, freq = get_bode_plot_data(config.PATH_DATA_BODE_FOLDER+tf['bode_values'])
+    mag, phs, freq = get_bode_plot_data(config.PATH_DATA+config.PATH_DATA_BODE+tf['bode_values'])
     gain_margin, gain_freq, phase_margin, phase_freq = get_margins(
-            config.PATH_DATA_BODE_FOLDER+tf['margin_values']
+            config.PATH_DATA+config.PATH_DATA_BODE+tf['margin_values']
             )
     bandwidth = find_bandwidth_freq(mag, freq)
     gain_margin, gain_freq, phase_margin, phase_freq = filter_gain_phase_margins(gain_margin, gain_freq, phase_margin, phase_freq)
@@ -241,7 +241,7 @@ for i, tf in enumerate(bode_names):
 
     if three_plots == 2:
         set_plot_decoration(ax)
-        fig.savefig(config.PATH_SAVE_FOLDER+file_name)
+        fig.savefig(config.PATH_SAVE+file_name)
         fig.clf()
         plt.close(fig)
         fig, ax = plt.subplots(2, sharex=True)
