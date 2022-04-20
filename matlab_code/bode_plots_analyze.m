@@ -1,15 +1,15 @@
 % TODO: crate .csv table for bode plot <12-04-22, lalapopa> %
 [r, c] = size(transfer_functions);
 
-for i = 1:c
-    [mag, phs, freq] = bode_to_table_format(transfer_functions(i));
-    [gain_m, phase_m] = bode_stats(transfer_functions(i));
+for tf_val = 1:c
+    [mag, phs, freq] = bode_to_table_format(transfer_functions(tf_val));
+    [gain_m, phase_m] = bode_stats(transfer_functions(tf_val));
     out_table_bode = table(mag, phs, freq); 
-    writetable(out_table_bode, strcat(FOLDER_BODE, data_names(i)),'Delimiter',','); 
+    writetable(out_table_bode, strcat(FOLDER_BODE, data_names(tf_val)),'Delimiter',','); 
 
-    [gain_m, phase_m, freq_gain, freq_phase] = bode_stats(transfer_functions(i));
+    [gain_m, phase_m, freq_gain, freq_phase] = bode_stats(transfer_functions(tf_val));
     out_table_bode_stats = table(gain_m, freq_gain, phase_m, freq_phase);
-    writetable(out_table_bode_stats, strcat(FOLDER_BODE, data_names_bode_stats(i)), 'Delimiter', ',');
+    writetable(out_table_bode_stats, strcat(FOLDER_BODE, data_names_bode_stats(tf_val)), 'Delimiter', ',');
 end
 
 function [mag, phase, freq] = bode_to_table_format(transfer_function)

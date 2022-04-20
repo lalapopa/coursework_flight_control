@@ -1,8 +1,9 @@
 clear;
 run('data.m');
 run('omega_0_max_xi_s_max_find.m');
-FOLDER = '~/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/';
-FOLDER_BODE = '~/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/bode/';
+FOLDER = '../data/';
+FOLDER_BODE = '../data/bode/';
+FOLDER_MODEL = '../data/model_result/';
 aero_data = AeroDynamicsData;
 
 p = tf('p');
@@ -73,16 +74,16 @@ H_calc = 10000; % Level flight
 mach_calc = return_element_in_another_matrix(H_array, H_calc, calc_mach);
 [r, c] = size(mach_calc);
 
-for i = 1:c
+for i = 1:c-2
     K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc(i), H_calc);
     K_theta_int = get_K_value(K_theta_calc, q_calc, mach_calc(i), H_calc);
 
-    [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int, aero_data, plane, W_p);
+    [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt, d_w_d_v, i_H, W_H_theta] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int, aero_data, plane, W_p);
 
     W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3);
     W_t_latex = tf_to_latex(W_AP_theta, 3);
     W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
-    W_a_latex = tf_to_latex(W_AP_alt, 3)
+    W_a_latex = tf_to_latex(W_AP_alt, 3);
     W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
     
     data_names = [
@@ -101,6 +102,10 @@ for i = 1:c
         ];
     transfer_functions = [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
     run('bode_plots_analyze.m');
+    run('linear_and_nonlinear_model.m');
+    
+
+
 end
 
 function [K_value] = get_K_value(K_array, q_array,  mach, height)
@@ -111,7 +116,7 @@ function [K_value] = get_K_value(K_array, q_array,  mach, height)
     K_value = interp1(q_array(ind), K_array(ind), q_target,'linear');
 end
 
-function [W_raz_1, W_raz_2, W_AP_theta, W_raz_3, W_AP_altitude] = get_control_system(mach, height, K_omega_z, K_theta, aero_data, plane, W_p)
+function [W_raz_1, W_raz_2, W_AP_theta, W_raz_3, W_AP_altitude, d_omega_d_delta_v, i_H, W_H_theta] = get_control_system(mach, height, K_omega_z, K_theta, aero_data, plane, W_p)
     [~, a, ~, rho] = atmosisa(height);
     V_target = mach.*a;
     p = tf('p');
@@ -149,9 +154,11 @@ function [W_raz_1, W_raz_2, W_AP_theta, W_raz_3, W_AP_altitude] = get_control_sy
 %            K_H = K_H - 1;
 %        end
 %    end
+    disp(['================================================='])
     disp(['MACH CALC = ' num2str(mach)])
-    disp(['overshoot= ', num2str(W_AP_H_step_info.Overshoot), ', K_H= ' ,num2str(K_H)]);
-    disp(['K_H_method/K_H_my= ', num2str(V_target/K_H)]);
+    disp(['overshoot= ', num2str(W_AP_H_step_info.Overshoot), ', K_H= ' , num2str(K_H)]);
+    disp(['i_H= ', num2str(i_H), ', K_omega_z= ', num2str(K_omega_z), ', K_theta= ', num2str(K_theta)]);
+%    disp(['K_H_method/K_H_my= ', num2str(V_target/K_H)]);
 end
 
 function latex_string = tf_to_latex(tf_, decimal)
