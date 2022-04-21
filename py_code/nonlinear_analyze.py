@@ -62,12 +62,21 @@ def validate_name(file_name, params):
 def remove_Delta_H_names(file_names):
     Delta_H_names = []
     another_names = []
+
     for name in file_names:
-        if re.search(r"Delta_H", name): 
+        if re.search(r"(?<=_)Delta_H(?=_H)", name): 
             Delta_H_names.append(name)
+        elif re.search(r"(?<=_)Delta_H_target(?=_H)", name):
+            continue 
         else:
             another_names.append(name)
     return another_names, Delta_H_names
+
+def get_input_signal(file_names):
+    for name in file_names:
+        if re.search(r"(?<=nonlinear_model_)Delta_H_target(?=_H)", name):
+            return name
+       
 
 pgf_setting()
 params =[
@@ -86,7 +95,9 @@ plot_labels_x = {
         }
 
 file_names = sorted(os.listdir(config.PATH_DATA+config.PATH_DATA_MODEL))
+print(file_names)
 nonlinear_names, linear_names = split_nonlinear_linear(file_names)
+input_signal_name = get_input_signal(file_names)
 linear_names, Delta_H_names_linear = remove_Delta_H_names(linear_names)
 nonlinear_names, Delta_H_names_nonlinear = remove_Delta_H_names(nonlinear_names)
     
@@ -102,7 +113,7 @@ for i, val in enumerate(linear_names):
     axes.plot(time_nl, value_nonlinear, label=f'Нелинейная модель, $M={mach_number}$')
     axes.plot(time_l, value_linear, '--', label=f'Линейная модель, $M={mach_number}$')
 
-    if three_plots == 2:
+    if three_plots == 0:
         validated_name = validate_name(val, params)
         plt.legend()
         plt.grid()
@@ -117,10 +128,31 @@ for i, val in enumerate(linear_names):
         fig.clf()
         plt.close(fig)
         fig, axes = plt.subplots(1)
-
         three_plots = 0
     else:
-        three_plots += 1
+        three_plots += 0
+
+
+fig, axes = plt.subplots(1)
+for i, name in enumerate(Delta_H_names_linear):
+
+    time_l, value_linear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL+name)
+    time_nl, value_nonlinear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL+Delta_H_names_nonlinear[i])
+
+    mach_number = from_name_get_mach_number(name)
+    axes.plot(time_nl, value_nonlinear, label=f'Нелинейная модель, $M={mach_number}$')
+    axes.plot(time_l, value_linear, '--', label=f'Линейная модель, $M={mach_number}$')
+    param_name = validate_name(name, params)
+
+time_input, value_input = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL+input_signal_name)
+
+axes.plot(time_input, value_input,':' ,label=r'$\Delta H_{зад}$')
+plt.legend()
+plt.grid()
+axes.set(ylabel=plot_labels_y[param_name])
+axes.set(xlabel=plot_labels_x['t'])
+save_path = config.PATH_SAVE+f"model_{param_name}.pgf"
+plt.savefig(config.PATH_SAVE+f"model_{param_name}.pgf")
 
 
 

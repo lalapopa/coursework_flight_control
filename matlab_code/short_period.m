@@ -47,7 +47,10 @@ for i = 1:r
         K_omega_z_gr = -(1/(bar_M_z_delta_v*T_n));
         K_omega_z(i, j) = epsilon*K_omega_z_gr;
         K_theta(i, j) = nu*K_omega_z(i,j);
+
         K_H(i, j) = V(i, j);
+%        K_omega_z(i, j) = 0.25*K_omega_z_gr;
+%        K_theta(i, j) = K_omega_z(i,j)*omega_0_H_M(i, j);
         i_H(i, j) = 0.8*(1/(T_1c*V(i,j)));
     end
 end
@@ -74,7 +77,7 @@ H_calc = 10000; % Level flight
 mach_calc = return_element_in_another_matrix(H_array, H_calc, calc_mach);
 [r, c] = size(mach_calc);
 
-for i = 1:c-2
+for i = 1:c
     K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc(i), H_calc);
     K_theta_int = get_K_value(K_theta_calc, q_calc, mach_calc(i), H_calc);
 
@@ -102,10 +105,9 @@ for i = 1:c-2
         ];
     transfer_functions = [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
     run('bode_plots_analyze.m');
-    run('linear_and_nonlinear_model.m');
-    
-
-
+%    if i == 2
+%        run('linear_and_nonlinear_model.m');
+%    end
 end
 
 function [K_value] = get_K_value(K_array, q_array,  mach, height)
@@ -132,6 +134,7 @@ function [W_raz_1, W_raz_2, W_AP_theta, W_raz_3, W_AP_altitude, d_omega_d_delta_
     W_AP_theta = feedback(W_raz_2, 1);
 
     T_1c = 1/bar_Y_alpha;
+    disp([T_1c])
     K_H = V_target;
     i_H = 0.8*(1/(T_1c*V_target));
 

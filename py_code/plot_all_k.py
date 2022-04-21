@@ -143,11 +143,12 @@ def plot_from_arrays(alts, x_values, y_values, legend_name, x_label, y_label):
                 )
 
 def save_figure(save_path):
-    plt.legend()
-    plt.grid()
-    plt.savefig(save_path)
-    print(f'figure saved in {save_path}')
-    plt.clf()
+    if '-s' in input_argv:
+        plt.legend()
+        plt.grid()
+        plt.savefig(save_path)
+        print(f'figure saved in {save_path}')
+        plt.clf()
 
 
 
@@ -171,8 +172,7 @@ fine_q = np.genfromtxt(config.PATH_DATA + 'fine_q.csv', delimiter=',')
 fine_K_omega_z = np.genfromtxt(config.PATH_DATA + 'fine_K_omega_z.csv', delimiter=',')
 plt.plot(fine_q, fine_K_omega_z, 'ko--', label='$K_{\\omega_z}$ выбранное')
 
-if '-s' in input_argv:
-    save_figure(config.PATH_SAVE+'K_omega_z_H_q.pgf')
+save_figure(config.PATH_SAVE+'K_omega_z_H_q.pgf')
 
 
 plot_from_arrays(altitudes, q, K_theta, 
@@ -182,16 +182,22 @@ plot_from_arrays(altitudes, q, K_theta,
 fine_K_theta = np.genfromtxt(config.PATH_DATA + 'fine_K_theta.csv', delimiter=',')
 plt.plot(fine_q, fine_K_theta, 'ko--', label='$K_{\\vartheta}$ выбранное')
 
-if '-s' in input_argv:
-    save_figure(config.PATH_SAVE + 'K_theta_H_q.pgf')
+save_figure(config.PATH_SAVE + 'K_theta_H_q.pgf')
 
 plot_from_arrays(altitudes, q, K_H, 
         '$K_{H}(q), H=%s$ м',
         '$q, [\\frac{кг}{м \\,с^2}$]', '$K_{H}$', 
         )
 
-if '-s' in input_argv:
-    save_figure(config.PATH_SAVE + 'K_H_H_q.pgf')
+save_figure(config.PATH_SAVE + 'K_H_H_q.pgf')
+
+
+plot_from_arrays(altitudes, q, i_H, 
+        '$i_{H}(q), H=%s$ м',
+        '$q, [\\frac{кг}{м \\,с^2}$]', '$i_{H}$', 
+        )
+save_figure(config.PATH_SAVE + 'i_H_H_q.pgf')
+
 
 if '-t' in input_argv:
     H_target = np.hstack(altitudes.to_numpy())

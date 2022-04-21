@@ -4,8 +4,8 @@ delta_elevator_max_up = -21 * (pi/180);
 delta_elevator_rate_down = -24 * (pi/180);
 delta_elevator_rate_up = 24 * (pi/180);
 
-theta_max_down = -6.5 * (pi/180); 
-theta_max_up = 6.5 * (pi/180); 
+theta_max_down = -6.0 * (pi/180); 
+theta_max_up = 6.0 * (pi/180); 
 Delta_H_target = 100;
 
 model_names = ["linear_model", "nonlinear_model"];
