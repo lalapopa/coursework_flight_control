@@ -105,9 +105,9 @@ for i = 1:c
         ];
     transfer_functions = [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
     run('bode_plots_analyze.m');
-%    if i == 2
-%        run('linear_and_nonlinear_model.m');
-%    end
+    if i == 2
+        run('linear_and_nonlinear_model.m');
+    end
 end
 
 function [K_value] = get_K_value(K_array, q_array,  mach, height)
