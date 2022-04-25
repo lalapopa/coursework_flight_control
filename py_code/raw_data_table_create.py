@@ -30,7 +30,7 @@ table_1 = {
         r'$\bar{x}_{F}$': convert_to_string_with_decimal_number(otn_x_f, 3),
         r'$m_z^{\bar{\omega}_z}$': convert_to_string_with_decimal_number(m_z_otn_omega_z, 2),
         r'$m_{z}^{\bar{\dot{\alpha}}}$': convert_to_string_with_decimal_number(m_z_bar_aa, 2),
-        r'$m_{z}^{\varphi}$': convert_to_string_with_decimal_number(m_z_phi, 4),
+#        r'$m_{z}^{\varphi}$': convert_to_string_with_decimal_number(m_z_phi, 4),
 #        r'$m_y^{\delta_{н}}$': convert_to_string_with_decimal_number(m_y_dn, 4),
 #        r'$m_y^\beta$': convert_to_string_with_decimal_number(m_y_beta, 4),
 #        r'$m_x^\beta$': convert_to_string_with_decimal_number(m_x_beta, 4),

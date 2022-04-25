@@ -84,7 +84,7 @@ params =[
         ]
 
 plot_labels_y = {
-        'theta' : r"$\theta,\ рад$",
+        'theta' : r"$\vartheta,\ рад$",
         'omega_z' : r"$\omega_z,\ рад/с$",
         'delta_elevator' : r"$\delta_{в},\ рад$",
         'Delta_H_target' : r"$\Delta H_{зад},\ м$",
@@ -117,6 +117,13 @@ for i, val in enumerate(linear_names):
         validated_name = validate_name(val, params)
         plt.legend()
         plt.grid()
+        if validated_name == 'delta_elevator':
+            ax2 = fig.add_axes([0.45, 0.3, 0.4, 0.3])
+            ax2.plot(time_nl,value_nonlinear)
+            ax2.plot(time_l, value_linear, '--' )
+            ax2.set_xlim([0, 3])
+            ax2.grid()
+
 
         axes.set(ylabel=plot_labels_y[validated_name])
         axes.set(xlabel=plot_labels_x['t'])
@@ -153,10 +160,6 @@ axes.set(ylabel=plot_labels_y[param_name])
 axes.set(xlabel=plot_labels_x['t'])
 save_path = config.PATH_SAVE+f"model_{param_name}.pgf"
 plt.savefig(config.PATH_SAVE+f"model_{param_name}.pgf")
-
-
-
-
 
 
 
