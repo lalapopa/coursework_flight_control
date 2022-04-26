@@ -147,7 +147,7 @@ def plot_margins(axs, g_m, g_f, p_m, p_f, horizontal_line=-180):
     if p_f == 0:
         pass
     else:
-        axs[1].axhline(horizontal_line, ls='--', color='k')
+        axs[1].axhline(horizontal_line, ls='--', color='k', linewidth=1)
 
     main_color = axs[0].lines[-1].get_color()
 
@@ -155,7 +155,7 @@ def plot_margins(axs, g_m, g_f, p_m, p_f, horizontal_line=-180):
         axs[1].plot([p_f, p_f], [horizontal_line, horizontal_line+p_m], 'k')
         axs[1].plot(p_f, horizontal_line+p_m, 'o', linewidth=2, c=main_color)
 
-    axs[0].axhline(0, ls='--', color='k')
+    axs[0].axhline(0, ls='--', color='k', linewidth=1)
     if g_f > 0:
         axs[0].plot([g_f, g_f], [-g_m, 0], 'k')
         axs[0].plot(g_f, -g_m, 'o', linewidth=2, c=main_color)
@@ -164,7 +164,8 @@ def plot_margins(axs, g_m, g_f, p_m, p_f, horizontal_line=-180):
 def set_plot_decoration(axs):
     axs[0].legend()
     for ax in axs:
-        ax.grid()
+        ax.grid(True, which='minor', linestyle='--', linewidth=0.25)
+        ax.grid(True, which='major')
         ax.set_xlim([10**-2, 10**3])
         ax.set_xlim([10**-2, 10**3])
 

@@ -83,9 +83,9 @@ q_calc_bode = [q_min_value, q_max_value];
 H_calc_bode = return_element_in_another_matrix(q, q_calc_bode, H_array);
 H_calc_bode(3) = 10000
 
-mach_calc = return_element_in_another_matrix(H_array, H_calc_bode(3), calc_mach);
+mach_calc = return_element_in_another_matrix(H_array, H_calc_bode(3), M_lf);
 [~, a, ~, rho] = atmosisa(H_calc_bode(3));
-V = mach_calc(2)*a;
+V = mach_calc*a;
 q_calc_bode(3) = (rho*V^2)/2;
 
 [~, a, ~, rho] = atmosisa(H_calc_bode);
