@@ -1,5 +1,6 @@
 clear;
 run('data.m');
+calc_mach = increase_column_elements(calc_mach, 6);
 run('omega_0_max_xi_s_max_find.m');
 FOLDER = '../data/';
 FOLDER_BODE = '../data/bode/';
@@ -22,7 +23,6 @@ W_p = 1/(T_n^2*p^2 + 2*xi_n*T_n*p + 1);
 %  FIND K_omega_z K_theta  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%calc_mach = increase_column_elements(calc_mach, 10);
 [r, c] = size(calc_mach);
 
 K_omega_z = zeros(r, c);
@@ -70,18 +70,39 @@ csvwrite([FOLDER 'fine_K_omega_z.csv'], K_omega_z_calc);
 csvwrite([FOLDER 'fine_K_theta.csv'], K_theta_calc);
 csvwrite([FOLDER 'fine_q.csv'], q_calc);
 
+%%%%%%%%%%%%%%%%%%%%%%%
+%  find analyze area  %
+%%%%%%%%%%%%%%%%%%%%%%%
+
+q_min_value = min(min(q));
+q_max_value = max(max(q));
+q_calc_bode = [q_min_value, q_max_value];
+H_calc_bode = return_element_in_another_matrix(q, q_calc_bode, H_array);
+H_calc_bode(3) = 10000
+
+mach_calc = return_element_in_another_matrix(H_array, H_calc_bode(3), calc_mach);
+[~, a, ~, rho] = atmosisa(H_calc_bode(3));
+V = mach_calc(2)*a;
+q_calc_bode(3) = (rho*V^2)/2;
+
+[~, a, ~, rho] = atmosisa(H_calc_bode);
+mach_calc_bode = sqrt(2.*q_calc_bode./rho).*(1./a);
+
+out_table = table(H_calc_bode', q_calc_bode', mach_calc_bode');
+out_table.Properties.VariableNames = {'H', 'q', 'mach'};
+writetable(out_table, strcat(FOLDER_BODE, 'bode_analyze_area.csv'), 'Delimiter', ',');
+
 %%%%%%%%%%%%%%%%%%%%
 %  A/P alt design  %
 %%%%%%%%%%%%%%%%%%%%
-H_calc = 10000; % Level flight
-mach_calc = return_element_in_another_matrix(H_array, H_calc, calc_mach);
-[r, c] = size(mach_calc);
+
+[r, c] = size(mach_calc_bode);
 
 for i = 1:c
-    K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc(i), H_calc);
-    K_theta_int = get_K_value(K_theta_calc, q_calc, mach_calc(i), H_calc);
+    K_omega_z_int = get_K_value(K_omega_z_calc, q_calc, mach_calc_bode(i), H_calc_bode(i));
+    K_theta_int = get_K_value(K_theta_calc, q_calc, mach_calc_bode(i), H_calc_bode(i));
 
-    [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt, d_w_d_v, i_H, W_H_theta] = get_control_system(mach_calc(i), H_calc, K_omega_z_int, K_theta_int, aero_data, plane, W_p);
+    [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt, d_w_d_v, i_H, W_H_theta] = get_control_system(mach_calc_bode(i), H_calc_bode(i), K_omega_z_int, K_theta_int, aero_data, plane, W_p);
 
     W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3);
     W_t_latex = tf_to_latex(W_AP_theta, 3);
@@ -90,22 +111,22 @@ for i = 1:c
     W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
     
     data_names = [
-        string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_theta_ol_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_theta_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_altitude_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f.csv', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_theta_ol_H_%i_M_0_%4.0f.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_theta_H_%i_M_0_%4.0f.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_altitude_H_%i_M_0_%4.0f.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
         ];
     data_names_bode_stats = [
-        string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_theta_ol_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_theta_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_altitude_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
-        string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f_stats.csv', H_calc, mach_calc(i)*10000)),...
+        string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f_stats.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_theta_ol_H_%i_M_0_%4.0f_stats.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_theta_H_%i_M_0_%4.0f_stats.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_altitude_H_%i_M_0_%4.0f_stats.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
+        string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f_stats.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
         ];
     transfer_functions = [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
     run('bode_plots_analyze.m');
-    if i == 2
+    if i == 3
         run('linear_and_nonlinear_model.m');
     end
 end

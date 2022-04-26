@@ -23,8 +23,3 @@ table_1 = {
         }
 print(pd.DataFrame(table_1).to_latex(escape=False, index=False))
 
-
-
-
-
-

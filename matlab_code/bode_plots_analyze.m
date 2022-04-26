@@ -1,4 +1,3 @@
-% TODO: crate .csv table for bode plot <12-04-22, lalapopa> %
 [r, c] = size(transfer_functions);
 
 for tf_val = 1:c

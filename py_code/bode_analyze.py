@@ -58,6 +58,17 @@ class BodeNames:
 
     def __is_stats_file(self, name):
         return re.search(r'_stats', name)
+    
+    @staticmethod
+    def get_bode_type_name(name): 
+        tf_names = ['W_theta_ol_H', 'W_theta_H', 'W_altitude_H', 'W_altitude_ol_H', 'W_core_damp_ol_H']
+        for tf_name in tf_names:
+            if tf_name in name:
+                return tf_name
+        return 'No_name'
+        
+
+
 
 
 def get_bode_plot_data(file_name):
@@ -115,41 +126,39 @@ def find_bandwidth_freq(mag, freq):
     if bw_freq:
         if len(bw_freq) == 1:
             return bw_freq[0]
-        return bw_freq 
+        return bw_freq[-1]
     else:
-        return None
+        return '-' 
         
 
 def check_phase_for_margin_plot(phase, freq, pm_freq):
-    phase_values = []
-    if all(pm_freq) == 0:
-        return -180
-    for i in pm_freq:
-        phase_int = interpolate.interp1d(freq, phase, kind='linear')
-        phase_values.append(phase_int(i))
-    max_phase = max(phase_values) 
-    if max_phase > 180:
+    avg_phase = calculate_avg(phase)
+    if -20 < avg_phase < 200:
         return 180
     else:
         return -180
 
+def calculate_avg(array):
+    max_value = max(array)
+    min_value = min(array)
+    return (max_value+min_value)/2
 
 def plot_margins(axs, g_m, g_f, p_m, p_f, horizontal_line=-180):
-    if all(p_f) == 0:
+    if p_f == 0:
         pass
     else:
         axs[1].axhline(horizontal_line, ls='--', color='k')
+
     main_color = axs[0].lines[-1].get_color()
-    for i, phase_freq in enumerate(p_f):
-        if phase_freq > 0:
-            axs[1].plot([phase_freq, phase_freq], [horizontal_line, horizontal_line+p_m[i]], 'k')
-            axs[1].plot(phase_freq, horizontal_line+p_m[i], 'o', linewidth=2, c=main_color)
+
+    if p_f > 0:
+        axs[1].plot([p_f, p_f], [horizontal_line, horizontal_line+p_m], 'k')
+        axs[1].plot(p_f, horizontal_line+p_m, 'o', linewidth=2, c=main_color)
 
     axs[0].axhline(0, ls='--', color='k')
-    for i, gain_freq in enumerate(g_f):
-        if gain_freq > 0:
-            axs[0].plot([gain_freq, gain_freq], [-g_m[i], 0], 'k')
-            axs[0].plot(gain_freq, -g_m[i], 'o', linewidth=2, c=main_color)
+    if g_f > 0:
+        axs[0].plot([g_f, g_f], [-g_m, 0], 'k')
+        axs[0].plot(g_f, -g_m, 'o', linewidth=2, c=main_color)
 
 
 def set_plot_decoration(axs):
@@ -172,7 +181,7 @@ def create_latex_table(column_M, column_bw, column_gain_m, column_phase_m):
                 r'$\Delta L$, град.': column_phase_m,
                 }
         df = pd.DataFrame(rows)
-        print(df.to_latex(escape=False, index=False, float_format="%.3f"))
+
     else:
         df = pd.DataFrame()
         for i, mach in enumerate(column_M):
@@ -184,18 +193,35 @@ def create_latex_table(column_M, column_bw, column_gain_m, column_phase_m):
             df2.index.set_names([r'$M$', r'$\Delta Q$, дБ'], inplace=True)
             df2 = df2.rename(columns={0:r'$\omega_{ср}$, рад/с', 1:r'$\Delta L$, град.'})
             df = pd.concat([df, df2])
-
         print(df.to_latex(escape=False, float_format="%.3f"))
+    return format_latex_table(df.to_latex(escape=False, index=False, float_format="%.3f"))
 
+def format_latex_table(latex_string):
+    re_hline = r'\\hline'
+    number_of_column = len(list(re.findall(r"(?<={)[lr]*(?=})", latex_string))[0])
+    print(number_of_column)
+    new_prefix = '|'+'c|'*number_of_column
+    latex_string = re.sub(r'(?<={)[lr]*(?=})', new_prefix, latex_string)
+    latex_string = re.sub(r'(\\bottomrule)|(\\midrule)|(\\toprule)', re_hline, latex_string)
+    return latex_string
+
+def save_string_to_file(input_data, file_name):
+    with open(file_name, "w") as f:
+        f.write(input_data)
 
 def filter_gain_phase_margins(gain_margin, gain_freq, phase_margin, phase_freq):
     if len(gain_margin) == 1 and len(phase_margin) == 1:
-        return gain_margin, gain_freq, phase_margin, phase_freq
-    for i, freq in enumerate(gain_freq):
-        if freq == 0:
-            gain_margin = np.delete(gain_margin, i)
-            gain_freq = np.delete(gain_freq, i)
-    return gain_margin, gain_freq, phase_margin, phase_freq
+        if phase_margin[0] == -180:
+            phase_margin = ['-']
+        return gain_margin[0], gain_freq[0], phase_margin[0], phase_freq[0]
+    if len(gain_margin) == 2:
+        max_gf_index = np.unique(np.where(gain_freq == np.max(gain_freq)))[0]
+        max_pf_index = np.unique(np.where(phase_freq== np.max(phase_freq)))[0]
+        return [
+                gain_margin[max_gf_index], gain_freq[max_gf_index],
+                phase_margin[max_pf_index], phase_freq[max_pf_index],
+                ]
+
 
 bode_names = BodeNames(sorted(file_names))
 three_plots = 0
@@ -207,31 +233,20 @@ column_phase_m = []
 fig, ax = plt.subplots(2, sharex=True)
 for i, tf in enumerate(bode_names):
     print(f'open {tf["bode_values"]}')
-
-
     mag, phs, freq = get_bode_plot_data(config.PATH_DATA+config.PATH_DATA_BODE+tf['bode_values'])
     gain_margin, gain_freq, phase_margin, phase_freq = get_margins(
             config.PATH_DATA+config.PATH_DATA_BODE+tf['margin_values']
             )
     bandwidth = find_bandwidth_freq(mag, freq)
+    print(f'BW = {bandwidth}')
+    print(f'PM in = {phase_margin}')
     gain_margin, gain_freq, phase_margin, phase_freq = filter_gain_phase_margins(gain_margin, gain_freq, phase_margin, phase_freq)
-    
+    print(f'PM out = {phase_margin}')
     column_M.append(f'{tf["mach"]}')
     column_bw.append(bandwidth)
-    if len(gain_margin) == 1:
-        column_gain_m.append(gain_margin[0])
-    else:
-        column_gain_m.append(gain_margin)
+    column_gain_m.append(gain_margin)
+    column_phase_m.append(phase_margin)
 
-    if len(phase_margin) == 1: 
-        if phase_margin[0] == -180 or phase_margin[0] == 0:
-            column_phase_m.append('-')
-        else:
-            column_phase_m.append(phase_margin[0])
-    else:
-        column_phase_m.append(phase_margin)
-        
-    
     ax = plot_bode(ax, mag, phs, freq, f'$M={tf["mach"]}$')
     horizontal_line = check_phase_for_margin_plot(phs, freq, phase_freq)
     plot_margins(ax, gain_margin, gain_freq, phase_margin, phase_freq, horizontal_line)
@@ -245,7 +260,11 @@ for i, tf in enumerate(bode_names):
         fig.clf()
         plt.close(fig)
         fig, ax = plt.subplots(2, sharex=True)
-        create_latex_table(column_M, column_bw, column_gain_m, column_phase_m)
+
+        latex_table = create_latex_table(column_M, column_bw, column_gain_m, column_phase_m)
+        save_string_to_file(latex_table,
+                config.PATH_REPORT+f'{bode_names.get_bode_type_name(tf["bode_values"])}.tex')
+
         three_plots = 0
         column_M = []
         column_bw = []
@@ -254,3 +273,4 @@ for i, tf in enumerate(bode_names):
         
     else:
         three_plots += 1
+

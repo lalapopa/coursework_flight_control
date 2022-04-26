@@ -1,7 +1,8 @@
 /coursework_flight_dynamics/
 /matlab_code/slprj/
 /matlab_code/ap_altitude_hold_model_grt_rtw/
-**/model_result/*
+*.csv
+!table_2.csv
 
 
 

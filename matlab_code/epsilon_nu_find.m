@@ -29,7 +29,7 @@ function [epsilon_out, nu_out] = epsilon_nu_find(mach, alt, aero_data, plane, W_
         W_H_theta = K_H/(p*(1 + T_1c*p));
         W_raz_3 = i_H*W_AP_theta*W_H_theta; 
         W_AP_H = feedback(W_raz_3, 1);
-        [a_out, xi, T] = damp(W_raz_2);
+        [a_out, xi, T] = damp(W_AP_theta);
         xi = xi(3);
         disp(['Try epsilon=', num2str(epsilon), ' Try nu=', num2str(nu), ' Xi_value=', num2str(xi)]);
         if(xi<=0.6)
