@@ -107,11 +107,11 @@ for i = 1:c
 
     [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt, d_w_d_v, i_H, W_H_theta] = get_control_system(mach_calc_bode(i), H_calc_bode(i), K_omega_z_int, K_theta_int, aero_data, plane, W_p);
 
-    W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3);
-    W_t_latex = tf_to_latex(W_AP_theta, 3);
-    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
-    W_a_latex = tf_to_latex(W_AP_alt, 3);
-    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
+    W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3)
+    W_t_latex = tf_to_latex(W_AP_theta, 3)
+    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3)
+    W_a_latex = tf_to_latex(W_AP_alt, 3)
+    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3)
     
     data_names = [
         string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...

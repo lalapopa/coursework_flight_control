@@ -38,18 +38,28 @@ class BodeNames:
         tf_names = ['W_theta_ol_H', 'W_theta_H', 'W_altitude_H', 'W_altitude_ol_H', 'W_core_damp_ol_H']
         for re_trigger in tf_names:
             r = re.compile(re_trigger)
-            transfer_functions_names= list(filter(r.match, self.names))
+            transfer_functions_names= self.__sort_by_mach(
+                    list(filter(r.match, self.names))
+                    )
             for tf in transfer_functions_names:
                 if self.__is_stats_file(tf):
                     continue
                 mach_number = self.__get_mach_number(tf)
                 stats_file = re.sub(r'\.', '_stats.', tf)
-
                 yield {
                         'bode_values': tf,
                         'margin_values': stats_file,
                         'mach': mach_number,
                         }
+
+    def __sort_by_mach(self, names):
+        mach_number = {} 
+        for i, name in enumerate(names): 
+            mach_value = self.__get_mach_number(name)
+            mach_number[i] = mach_value 
+        sorted_mach = {w:mach_number[w] for w in sorted(mach_number, key=mach_number.get)}
+        index_sorted_mach = list(sorted_mach.keys())
+        return [names[i] for i in index_sorted_mach]
 
     def __get_mach_number(self, name):
         mach_pattern = r"0_[\d]{4}"
@@ -239,10 +249,7 @@ for i, tf in enumerate(bode_names):
             config.PATH_DATA+config.PATH_DATA_BODE+tf['margin_values']
             )
     bandwidth = find_bandwidth_freq(mag, freq)
-    print(f'BW = {bandwidth}')
-    print(f'PM in = {phase_margin}')
     gain_margin, gain_freq, phase_margin, phase_freq = filter_gain_phase_margins(gain_margin, gain_freq, phase_margin, phase_freq)
-    print(f'PM out = {phase_margin}')
     column_M.append(f'{tf["mach"]}')
     column_bw.append(bandwidth)
     column_gain_m.append(gain_margin)
