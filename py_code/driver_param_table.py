@@ -13,7 +13,7 @@ def add_text_to_array_cell(matrix, add_text, row_pos, column_pos):
             row_to_append = []
             for i_e, el in enumerate(row):
                 if i_e in column_pos:
-                    row_to_append.append(f'{el} {add_text}')
+                    row_to_append.append(f'{el}{add_text}')
                     column_pos = np.delete(column_pos, 0)
                 else:
                     row_to_append.append(el)
