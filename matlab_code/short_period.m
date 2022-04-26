@@ -6,8 +6,10 @@ FOLDER = '../data/';
 FOLDER_BODE = '../data/bode/';
 FOLDER_MODEL = '../data/model_result/';
 aero_data = AeroDynamicsData;
-
 p = tf('p');
+
+delete_csv_file_in_folder(FOLDER_BODE)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Servo motor parameters  %
@@ -58,6 +60,7 @@ end
 [K_omega_z_calc, q_calc] = get_trend_approx_values(K_omega_z, q, max(size(calc_mach)));
 K_theta_calc = get_trend_approx_values(K_theta, q, max(size(calc_mach)));
 
+csvwrite([FOLDER 'flight_area_mach.csv'], calc_mach);
 csvwrite([FOLDER 'K_H_all.csv'], K_H);
 csvwrite([FOLDER 'K_omega_z_all.csv'], K_omega_z);
 csvwrite([FOLDER 'K_theta_all.csv'], K_theta);
@@ -263,4 +266,19 @@ function [values] = return_element_in_another_matrix(matrix1, matrix1_elements, 
     end
 end
 
-
+function delete_csv_file_in_folder(folder)
+    if ~isdir(folder)
+      errorMessage = sprintf('Error: The following folder does not exist:\n%s', myFolder);
+      uiwait(warndlg(errorMessage));
+      return;
+    end
+    % Get a list of all files in the folder with the desired file name pattern.
+    files = fullfile(folder, '*.csv'); % Change to whatever pattern you need.
+    file_names= dir(files);
+    for k = 1 : length(file_names)
+      baseFileName = file_names(k).name;
+      fullFileName = fullfile(folder, baseFileName);
+      fprintf(1, 'Now deleting %s\n', fullFileName);
+      delete(fullFileName);
+    end
+end

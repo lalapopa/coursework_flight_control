@@ -1,5 +1,6 @@
 [r, c] = size(transfer_functions);
 
+
 for tf_val = 1:c
     [mag, phs, freq] = bode_to_table_format(transfer_functions(tf_val));
     [gain_m, phase_m] = bode_stats(transfer_functions(tf_val));
