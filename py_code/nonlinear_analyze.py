@@ -96,6 +96,7 @@ plot_labels_x = {
 
 file_names = sorted(os.listdir(config.PATH_DATA+config.PATH_DATA_MODEL))
 print(file_names)
+file_names = [i for i in file_names if '_stats_' not in i]
 nonlinear_names, linear_names = split_nonlinear_linear(file_names)
 input_signal_name = get_input_signal(file_names)
 linear_names, Delta_H_names_linear = remove_Delta_H_names(linear_names)
@@ -160,8 +161,4 @@ axes.set(ylabel=plot_labels_y[param_name])
 axes.set(xlabel=plot_labels_x['t'])
 save_path = config.PATH_SAVE+f"model_{param_name}.pgf"
 plt.savefig(config.PATH_SAVE+f"model_{param_name}.pgf")
-
-
-
-
 

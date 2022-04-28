@@ -1,8 +1,8 @@
 delta_elevator_max_down = 15 * (pi/180); 
 delta_elevator_max_up = -21 * (pi/180); 
 
-delta_elevator_rate_down = -24 * (pi/180);
-delta_elevator_rate_up = 24 * (pi/180);
+delta_elevator_rate_down = -60 * (pi/180);
+delta_elevator_rate_up = 60 * (pi/180);
 
 theta_max_down = -6.0 * (pi/180); 
 theta_max_up = 6.0 * (pi/180); 
@@ -19,6 +19,8 @@ for model_name_index = 1:length(model_names)
     save_data_to_table(out.sim_delta_elevator, "delta_elevator", model_names(model_name_index), H_calc_bode(i), mach_calc_bode(i), FOLDER_MODEL)
     save_data_to_table(out.sim_theta, "theta", model_names(model_name_index), H_calc_bode(i), mach_calc_bode(i), FOLDER_MODEL)
     save_data_to_table(out.sim_Delta_H, "Delta_H", model_names(model_name_index), H_calc_bode(i), mach_calc_bode(i), FOLDER_MODEL)
+    save_system_step_stats(out.sim_Delta_H, "stats", model_names(model_name_index), H_calc_bode(i), mach_calc_bode(i), FOLDER_MODEL);
+
 end
 
 function save_data_to_table(param, param_name, model_name, H, mach, folder_path) 
@@ -38,6 +40,11 @@ function name = create_sim_name(model_type, H, mach, param)
     name = string(sprintf('%s_%s_H_%i_M_0_%4.0f.csv', model_type, param, H, mach*10000));
 end
 
+function save_system_step_stats(param, param_name, model_name, H, mach, folder_path)
+    save_name = create_sim_name(model_name, H, mach, param_name);
+    step_info = stepinfo(param.Data, param.Time, 'SettlingTime', 0.05);
+    writetable(struct2table(step_info), strcat(folder_path, save_name));
+end
 
 
 

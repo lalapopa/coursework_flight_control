@@ -1,9 +1,11 @@
 PATH_DATA = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
+PATH_DATA = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
 PATH_SAVE = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/figures/'
 PATH_REPORT = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/tables/'
 
 PATH_DATA_BODE = 'bode/' 
 PATH_DATA_MODEL = 'model_result/' 
+PATH_DATA_MODEL_DD = 'model_result_diff_speed/' 
 
 FILE_OMEGA_0_PR= 'omega_0_pr.csv'
 FILE_H = 'H_all.csv'

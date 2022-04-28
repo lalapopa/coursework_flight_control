@@ -5,10 +5,13 @@ run('omega_0_max_xi_s_max_find.m');
 FOLDER = '../data/';
 FOLDER_BODE = '../data/bode/';
 FOLDER_MODEL = '../data/model_result/';
+FOLDER_MODEL_DIFF_SPEED = '../data/model_result_diff_speed/';
 aero_data = AeroDynamicsData;
 p = tf('p');
 
 delete_csv_file_in_folder(FOLDER_BODE)
+delete_csv_file_in_folder(FOLDER_MODEL)
+delete_csv_file_in_folder(FOLDER_MODEL_DIFF_SPEED)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,7 +84,7 @@ q_min_value = min(min(q));
 q_max_value = max(max(q));
 q_calc_bode = [q_min_value, q_max_value];
 H_calc_bode = return_element_in_another_matrix(q, q_calc_bode, H_array);
-H_calc_bode(3) = 10000
+H_calc_bode(3) = 10000;
 
 mach_calc = return_element_in_another_matrix(H_array, H_calc_bode(3), M_lf);
 [~, a, ~, rho] = atmosisa(H_calc_bode(3));
@@ -107,11 +110,11 @@ for i = 1:c
 
     [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt_ol, W_AP_alt, d_w_d_v, i_H, W_H_theta] = get_control_system(mach_calc_bode(i), H_calc_bode(i), K_omega_z_int, K_theta_int, aero_data, plane, W_p);
 
-    W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3)
-    W_t_latex = tf_to_latex(W_AP_theta, 3)
-    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3)
-    W_a_latex = tf_to_latex(W_AP_alt, 3)
-    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3)
+    W_c_damp_ol_latex = tf_to_latex(W_core_damp_ol, 3);
+    W_t_latex = tf_to_latex(W_AP_theta, 3);
+    W_a_ol_latex = tf_to_latex(W_AP_alt_ol, 3);
+    W_a_latex = tf_to_latex(W_AP_alt, 3);
+    W_t_ol_latex = tf_to_latex(W_AP_theta_ol, 3);
     
     data_names = [
         string(sprintf('W_core_damp_ol_H_%i_M_0_%4.0f.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
@@ -131,6 +134,7 @@ for i = 1:c
     run('bode_plots_analyze.m');
     if i == 3
         run('linear_and_nonlinear_model.m');
+        run('linear_and_nonlinear_model_diff_speed_deff.m');
     end
 end
 

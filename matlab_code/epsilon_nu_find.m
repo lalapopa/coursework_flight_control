@@ -14,7 +14,7 @@ function [epsilon_out, nu_out] = epsilon_nu_find(mach, alt, aero_data, plane, W_
     K_theta = nu*K_omega_z;
     K_H = V;
 
-    i_H = 0.8*(1/(T_1c*V));
+    i_H = 0.5*(1/(T_1c*V));
 
     d_omega_d_delta_v = (bar_M_z_delta_v*(p + bar_Y_alpha))/(p^2 + 2*xi_k*omega_0*p + omega_0^2); 
 
@@ -29,8 +29,7 @@ function [epsilon_out, nu_out] = epsilon_nu_find(mach, alt, aero_data, plane, W_
         W_H_theta = K_H/(p*(1 + T_1c*p));
         W_raz_3 = i_H*W_AP_theta*W_H_theta; 
         W_AP_H = feedback(W_raz_3, 1);
-        [a_out, xi, T] = damp(W_AP_theta);
-        disp([xi])
+        [a_out, xi, T] = damp(W_raz_2);
         xi = xi(3);
         disp(['Try epsilon=', num2str(epsilon), ' Try nu=', num2str(nu), ' Xi_value=', num2str(xi)]);
         if(xi<=0.6)
