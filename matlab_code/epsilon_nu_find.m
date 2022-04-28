@@ -14,7 +14,7 @@ function [epsilon_out, nu_out] = epsilon_nu_find(mach, alt, aero_data, plane, W_
     K_theta = nu*K_omega_z;
     K_H = V;
 
-    i_H = 0.5*(1/(T_1c*V));
+    i_H = 0.8*(1/(T_1c*V));
 
     d_omega_d_delta_v = (bar_M_z_delta_v*(p + bar_Y_alpha))/(p^2 + 2*xi_k*omega_0*p + omega_0^2); 
 
