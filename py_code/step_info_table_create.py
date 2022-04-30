@@ -18,7 +18,7 @@ def return_linear_nonlinear_names(file_names):
 
 
 
-file_names = sorted(os.listdir(config.PATH_DATA+config.PATH_DATA_MODEL))
+file_names = sorted(os.listdir(config.PATH_DATA+data))
 file_names = [i for i in file_names if '_stats_' in i] 
 linear_data_name, nonlinear_data_name = return_linear_nonlinear_names(file_names)
 

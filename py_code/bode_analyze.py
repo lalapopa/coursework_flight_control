@@ -78,9 +78,6 @@ class BodeNames:
         return 'No_name'
         
 
-
-
-
 def get_bode_plot_data(file_name):
     df = pd.read_csv(file_name)
     mag = df['mag'].to_numpy() 
@@ -103,12 +100,14 @@ def get_margins(file_name):
     gain_freq = df['freq_gain'].to_numpy()
     phase_margins = df['phase_m'].to_numpy()
     phase_freq = df['freq_phase'].to_numpy()
-    index_inf_values = np.where(gain_margins==np.Inf)
 
-    gain_margins = np.delete(gain_margins, index_inf_values)
-    gain_freq = np.delete(gain_freq, index_inf_values)
-    phase_margins = np.delete(phase_margins, index_inf_values)
-    phase_freq = np.delete(phase_freq, index_inf_values)
+    index_inf_values_gain = np.where(gain_margins==np.Inf)
+    index_inf_values_phase = np.where(phase_margins==np.Inf)
+
+    gain_margins = np.delete(gain_margins, index_inf_values_gain)
+    gain_freq = np.delete(gain_freq, index_inf_values_gain)
+    phase_margins = np.delete(phase_margins, index_inf_values_phase)
+    phase_freq = np.delete(phase_freq, index_inf_values_phase)
     return [gain_margins.astype('float64'), gain_freq.astype('float64'), phase_margins.astype('float64'), phase_freq.astype('float64')]
 
 def find_bandwidth_freq(mag, freq):
@@ -154,6 +153,8 @@ def calculate_avg(array):
     return (max_value+min_value)/2
 
 def plot_margins(axs, g_m, g_f, p_m, p_f, horizontal_line=-180):
+    print(f"g_m plot= {g_m}, g_f plot= {g_f}, p_m plot= {p_m}, p_f plot= {p_f}")
+
     if p_f == 0:
         pass
     else:
@@ -221,11 +222,16 @@ def save_string_to_file(input_data, file_name):
         f.write(input_data)
 
 def filter_gain_phase_margins(gain_margin, gain_freq, phase_margin, phase_freq):
+    print("="*10,"MARGINS IN FILTER","="*10)
+
+    print(f"g_m plot= {gain_margin}, g_f plot= {gain_freq}, p_m plot= {phase_margin}, p_f plot= {phase_freq}")
+    print("="*25)
+
     if len(gain_margin) == 1 and len(phase_margin) == 1:
         if phase_margin[0] == -180:
             phase_margin = ['-']
         return gain_margin[0], gain_freq[0], phase_margin[0], phase_freq[0]
-    if len(gain_margin) == 2:
+    else:
         max_gf_index = np.unique(np.where(gain_freq == np.max(gain_freq)))[0]
         max_pf_index = np.unique(np.where(phase_freq== np.max(phase_freq)))[0]
         return [

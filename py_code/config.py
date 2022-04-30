@@ -1,5 +1,4 @@
 PATH_DATA = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
-PATH_DATA = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
 PATH_SAVE = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/figures/'
 PATH_REPORT = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/tables/'
 
