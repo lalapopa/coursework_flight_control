@@ -85,10 +85,10 @@ def get_bode_plot_data(file_name):
     freq = df['freq'].to_numpy() 
     return (mag, phs, freq) 
 
-def plot_bode(ax, mag, phase, freq, label_text):
-    ax[0].plot(freq, mag, label=label_text)
+def plot_bode(ax, mag, phase, freq, label_text, color_hex):
+    ax[0].plot(freq, mag, label=label_text, color=color_hex)
     ax[0].set(ylabel='Амплитуда, [дБ]')
-    ax[1].plot(freq, phase, label=label_text)
+    ax[1].plot(freq, phase, label=label_text, color=color_hex)
     ax[1].set(ylabel='Фаза, [град.]')
     ax[0].set_xscale('log')
     ax[1].set_xscale('log')
@@ -248,6 +248,12 @@ column_gain_m = []
 column_phase_m = []
 
 fig, ax = plt.subplots(2, sharex=True)
+color_sequence = [
+        "#525252",
+        "#969696",
+        "#cccccc",
+        ]
+
 for i, tf in enumerate(bode_names):
     print(f'open {tf["bode_values"]}')
     mag, phs, freq = get_bode_plot_data(config.PATH_DATA+config.PATH_DATA_BODE+tf['bode_values'])
@@ -261,7 +267,7 @@ for i, tf in enumerate(bode_names):
     column_gain_m.append(gain_margin)
     column_phase_m.append(phase_margin)
 
-    ax = plot_bode(ax, mag, phs, freq, f'$M={tf["mach"]}$')
+    ax = plot_bode(ax, mag, phs, freq, f'$M={tf["mach"]}$', color_sequence[three_plots])
     horizontal_line = check_phase_for_margin_plot(phs, freq, phase_freq)
     plot_margins(ax, gain_margin, gain_freq, phase_margin, phase_freq, horizontal_line)
 

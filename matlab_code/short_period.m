@@ -130,7 +130,7 @@ for i = 1:c
         string(sprintf('W_altitude_H_%i_M_0_%4.0f_stats.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
         string(sprintf('W_altitude_ol_H_%i_M_0_%4.0f_stats.csv', H_calc_bode(i), mach_calc_bode(i)*10000)),...
         ];
-    transfer_functions = [W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
+    transfer_functions = [-W_core_damp_ol, W_AP_theta_ol, W_AP_theta, W_AP_alt, W_AP_alt_ol];
     run('bode_plots_analyze.m');
     if i == 3
         run('linear_and_nonlinear_model.m');
