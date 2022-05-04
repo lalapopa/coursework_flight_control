@@ -38,7 +38,7 @@ def split_nonlinear_linear(file_names):
     unique_variant = list(set(variants))
     if len(unique_variant) != 2:
         raise ValueError
-
+    print(unique_variant)
     for name in file_names:
         if re.search(unique_variant[0], name):
             linear.append(name)
@@ -103,6 +103,7 @@ plot_labels_x = {
 
 file_names = sorted(os.listdir(config.PATH_DATA+config.PATH_DATA_MODEL_DD))
 print(file_names)
+file_names = [i for i in file_names if '_stats_' not in i]
 nonlinear_names, linear_names = split_nonlinear_linear(file_names)
 input_signal_name = get_input_signal(file_names)
 linear_names, Delta_H_names_linear = remove_Delta_H_names(linear_names)
