@@ -8,8 +8,6 @@ for tf_val = 1:c
     writetable(out_table_bode, strcat(FOLDER_BODE, data_names(tf_val)),'Delimiter',','); 
 
     [gain_m, phase_m, freq_gain, freq_phase] = bode_stats(transfer_functions(tf_val));
-    disp(tf_val)
-    disp([gain_m, phase_m, freq_gain, freq_phase])
     out_table_bode_stats = table(gain_m, freq_gain, phase_m, freq_phase);
     writetable(out_table_bode_stats, strcat(FOLDER_BODE, data_names_bode_stats(tf_val)), 'Delimiter', ',');
 end
@@ -27,9 +25,9 @@ function [gains, phase_m, freq_gain, freq_phase] = bode_stats(transfer_function)
     freq_gain = transpose(stats.GMFrequency);
     gains = transpose(gain_to_dB(stats.GainMargin));
     if ismember(inf, freq_gain)
-        inf_index = find(freq_gain == inf)
-        freq_gain(inf_index) = []
-        gains(inf_index) = []
+        inf_index = find(freq_gain == inf);
+        freq_gain(inf_index) = [];
+        gains(inf_index) = [];
     end
 
     freq_phase = transpose(stats.PMFrequency);

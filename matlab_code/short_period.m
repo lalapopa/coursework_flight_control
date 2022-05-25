@@ -154,17 +154,22 @@ function [W_raz_1, W_raz_2, W_AP_theta, W_raz_3, W_AP_altitude, d_omega_d_delta_
 
     omega_0 = sqrt(-bar_M_z_alpha - bar_M_z_omega_z.*bar_Y_alpha);
     xi_k = (bar_Y_alpha - bar_M_z_omega_z - bar_M_z_dot_alpha)./(2.*omega_0);
+    disp(['xi_k = ', num2str(xi_k)])
+
+    K_omega_z_gr = -(1/(bar_M_z_delta_v*0.045));
+    disp(['K_omega_z_GR ='])
+    disp([K_omega_z_gr])
 
     d_omega_d_delta_v = (bar_M_z_delta_v*(p + bar_Y_alpha))/(p^2 + 2*xi_k*omega_0*p + omega_0^2); 
     W_raz_1 = W_p*d_omega_d_delta_v;
-    W_zam_1 = feedback(W_raz_1, -K_omega_z);
+    W_zam_1 = feedback(W_raz_1, -K_omega_z); % K_omegaz
     W_raz_2 = -K_theta*W_zam_1*(1/p);
     W_AP_theta = feedback(W_raz_2, 1);
 
     T_1c = 1/bar_Y_alpha;
-    disp([T_1c])
     K_H = V_target;
     i_H = 0.8*(1/(T_1c*V_target));
+    disp(['i_h', num2str( i_H )])
 
     W_H_theta = (K_H)/(p*(1 + T_1c*p));
     W_raz_3 = i_H*W_AP_theta*W_H_theta;
