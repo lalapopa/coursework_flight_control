@@ -50,12 +50,12 @@ for i = 1:r
         q(i, j) = (rho.*V(i,j).^2)/2;
         T_1c = 1/bar_Y_alpha;
         K_omega_z_gr = -(1/(bar_M_z_delta_v*T_n));
-        K_omega_z(i, j) = epsilon*K_omega_z_gr;
-        K_theta(i, j) = nu*K_omega_z(i,j);
+%        K_omega_z(i, j) = epsilon*K_omega_z_gr;
+%        K_theta(i, j) = nu*K_omega_z(i,j);
 
         K_H(i, j) = V(i, j);
-%        K_omega_z(i, j) = 0.25*K_omega_z_gr;
-%        K_theta(i, j) = K_omega_z(i,j)*omega_0_H_M(i, j);
+        K_omega_z(i, j) = 0.25*K_omega_z_gr;
+        K_theta(i, j) = K_omega_z(i,j)*omega_0_H_M(i, j);
         i_H(i, j) = 0.8*(1/(T_1c*V(i,j)));
     end
 end
@@ -142,8 +142,16 @@ function [K_value] = get_K_value(K_array, q_array,  mach, height)
     [~, a, ~, rho] = atmosisa(height);
     V_target = mach.*a;
     q_target = (rho.*V_target.^2)./2;
-    [~, ind] = unique(K_array);
-    K_value = interp1(q_array(ind), K_array(ind), q_target,'linear');
+    [~, ind] = unique(K_array)
+    disp([q_array])
+    disp([q_target])
+    if q_array(1) > q_target
+        K_value = K_array(1)
+    elseif q_array(end) < q_target
+        K_value = K_array(end)
+    else
+        K_value = interp1(q_array(ind), K_array(ind), q_target,'linear');
+    end
 end
 
 function [W_raz_1, W_raz_2, W_AP_theta, W_raz_3, W_AP_altitude, d_omega_d_delta_v, i_H, W_H_theta] = get_control_system(mach, height, K_omega_z, K_theta, aero_data, plane, W_p)

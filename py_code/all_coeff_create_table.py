@@ -104,9 +104,6 @@ K_theta = pd.read_csv(config.PATH_DATA + config.FILE_K_THETA, header=None)
 K_H = pd.read_csv(config.PATH_DATA + config.FILE_K_H, header=None) 
 i_H = pd.read_csv(config.PATH_DATA + config.FILE_i_H, header=None) 
 
-
-
-
 latex_table = generate_table_k_theta_k_omega(altitudes, mach, K_theta, K_omega_z, K_H, i_H)
 file_name = config.PATH_REPORT+'table_coeffs.tex'
 save_string_to_file(latex_table, file_name)

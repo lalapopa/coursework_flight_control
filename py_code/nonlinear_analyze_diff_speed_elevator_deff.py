@@ -59,6 +59,10 @@ def from_name_get_mach_number(file_name):
     raw_mach_number = re.findall(mach_pattern, file_name)
     return float(re.sub(r"_", '.', raw_mach_number[0]))
 
+def from_name_get_driver_speed(file_name):
+    mach_pattern = r"(?<=DD_)\d\.\d*"
+    return re.findall(mach_pattern, file_name)[0]
+
 def validate_name(file_name, params):
     for name in params:
         re_name = f"(?<=_){name}(?=_DD)"
@@ -111,10 +115,21 @@ nonlinear_names, Delta_H_names_nonlinear = remove_Delta_H_names(nonlinear_names)
 
 fig, axes = plt.subplots(1)
 three_plots = 0
+
 for i, val in enumerate(linear_names):
     print(f'#{i} | {val} | {nonlinear_names[i]}')
-    time_l, value_linear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+val)
-    time_nl, value_nonlinear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+nonlinear_names[i])
+
+    driver_speed_l = from_name_get_driver_speed(val)
+    driver_speed_nl = from_name_get_driver_speed(nonlinear_names[i])
+    if driver_speed_l < driver_speed_nl:
+        slow_model_name = val
+        fast_model_name = nonlinear_names[i]
+    elif driver_speed_nl < driver_speed_l:
+        slow_model_name = nonlinear_names[i]
+        fast_model_name = val
+
+    time_l, value_linear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+fast_model_name)
+    time_nl, value_nonlinear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+slow_model_name)
 
     mach_number = from_name_get_mach_number(val)
     axes.plot(time_nl, value_nonlinear, label=r'Модель при $\dot{\delta}_{{в}_{max}}=15 \frac{град.}{сек.}$')
@@ -146,8 +161,18 @@ for i, val in enumerate(linear_names):
 fig, axes = plt.subplots(1)
 for i, name in enumerate(Delta_H_names_linear):
 
-    time_l, value_linear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+name)
-    time_nl, value_nonlinear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+Delta_H_names_nonlinear[i])
+    driver_speed_l = from_name_get_driver_speed(name)
+    driver_speed_nl = from_name_get_driver_speed(Delta_H_names_nonlinear[i])
+
+    if driver_speed_l < driver_speed_nl:
+        slow_model_name = name 
+        fast_model_name = Delta_H_names_nonlinear[i]
+    elif driver_speed_nl < driver_speed_l:
+        slow_model_name = Delta_H_names_nonlinear[i] 
+        fast_model_name = name 
+
+    time_l, value_linear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+fast_model_name)
+    time_nl, value_nonlinear = get_data_from_csv(config.PATH_DATA+config.PATH_DATA_MODEL_DD+slow_model_name)
 
     mach_number = from_name_get_mach_number(name)
     axes.plot(time_nl, value_nonlinear, label=r'Модель при $\dot{\delta}_{{в}_{max}}=15 \frac{град.}{сек.}$')

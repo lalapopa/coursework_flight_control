@@ -1,6 +1,6 @@
-PATH_DATA = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/code/data/'
-PATH_SAVE = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/figures/'
-PATH_REPORT = '/home/lalapopa/Documents/uni/4_course/2_sem/flight_control/cource_work/report/tables/'
+PATH_DATA = '/home/lalapopa/Documents/uni/4_course/2_sem/diploma_work/course_work_flight_control/code/data/'
+PATH_SAVE = '/home/lalapopa/Documents/uni/4_course/2_sem/diploma_work/course_work_flight_control/report/figures/'
+PATH_REPORT = '/home/lalapopa/Documents/uni/4_course/2_sem/diploma_work/course_work_flight_control/report/tables/'
 
 PATH_DATA_BODE = 'bode/' 
 PATH_DATA_MODEL = 'model_result/' 
