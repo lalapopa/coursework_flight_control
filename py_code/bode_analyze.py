@@ -90,6 +90,7 @@ def plot_bode(ax, mag, phase, freq, label_text, color_hex):
     ax[0].set(ylabel='Амплитуда, [дБ]')
     ax[1].plot(freq, phase, label=label_text, color=color_hex)
     ax[1].set(ylabel='Фаза, [град.]')
+    ax[1].set(xlabel='Частота, [рад/с]')
     ax[0].set_xscale('log')
     ax[1].set_xscale('log')
     return ax
