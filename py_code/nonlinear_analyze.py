@@ -1,3 +1,4 @@
+import sys
 import os 
 import re
 import config
@@ -12,22 +13,45 @@ warnings.simplefilter("ignore", FutureWarning)
 def pgf_setting():
     matplotlib.rcParams.update(matplotlib.rcParamsDefault)
     matplotlib.use("pgf")
-    matplotlib.rcParams.update(
-    {
-    "pgf.texsystem": "pdflatex",
-    "font.family": "serif",
-    "text.usetex": True,
-    "pgf.rcfonts": False,
-    "pgf.preamble": "\n".join(
-    [
-    r"\usepackage[warn]{mathtext}",
-    r"\usepackage[T2A]{fontenc}",
-    r"\usepackage[utf8]{inputenc}",
-    r"\usepackage[english,russian]{babel}",
-    ]
-    ),
-    }
-    )
+    if sys.argv[-1] == 'slide':   
+        matplotlib.rcParams.update(
+            {
+            "figure.figsize": (7.4, 5.2),
+            "pgf.texsystem": "pdflatex",
+            "font.family": "serif",
+            "text.usetex": True,
+            "pgf.rcfonts": False,
+            "font.size": 11,
+            "xtick.labelsize": 14,
+            "ytick.labelsize": 14,
+            'axes.labelsize': 14,
+            "pgf.preamble": "\n".join(
+            [
+            r"\usepackage[warn]{mathtext}",
+            r"\usepackage[T2A]{fontenc}",
+            r"\usepackage[utf8]{inputenc}",
+            r"\usepackage[english,russian]{babel}",
+            ]
+            ),
+            }
+            )
+    else:
+        matplotlib.rcParams.update(
+            {
+            "pgf.texsystem": "pdflatex",
+            "font.family": "serif",
+            "text.usetex": True,
+            "pgf.rcfonts": False,
+            "pgf.preamble": "\n".join(
+            [
+            r"\usepackage[warn]{mathtext}",
+            r"\usepackage[T2A]{fontenc}",
+            r"\usepackage[utf8]{inputenc}",
+            r"\usepackage[english,russian]{babel}",
+            ]
+            ),
+            }
+            )
 
 def split_nonlinear_linear(file_names):
     nonlinear = []
@@ -77,7 +101,6 @@ def get_input_signal(file_names):
         if re.search(r"(?<=nonlinear_model_)Delta_H_target(?=_H)", name):
             return name
        
-
 pgf_setting()
 params =[
         "omega_z", "Delta_H_target", "Delta_H", "delta_elevator", "theta", "Delta_H"
@@ -124,14 +147,15 @@ for i, val in enumerate(linear_names):
             ax2.plot(time_l, value_linear, '--' )
             ax2.set_xlim([0, 3])
             ax2.grid()
-
-
         axes.set(ylabel=plot_labels_y[validated_name])
         axes.set(xlabel=plot_labels_x['t'])
+        axes.set_xlim([0, max(time_l)])
 
-        save_path = config.PATH_SAVE+f"model_{validated_name}.pgf"
-
-        plt.savefig(config.PATH_SAVE+f"model_{validated_name}.pgf")
+        if sys.argv[-1] == 'slide':
+            save_path = config.PATH_SAVE+f"model_{validated_name}_s.pgf"
+        else:
+            save_path = config.PATH_SAVE+f"model_{validated_name}.pgf"
+        plt.savefig(save_path)
         print(f'saved to {save_path}')
         fig.clf()
         plt.close(fig)
@@ -158,7 +182,16 @@ axes.plot(time_input, value_input,':' ,label=r'$\Delta H_{зад}$')
 plt.legend()
 plt.grid()
 axes.set(ylabel=plot_labels_y[param_name])
+
+_, ymax = axes.get_ylim()
+axes.set_ylim([0, ymax])
+axes.set_xlim([0, max(time_input)])
+
 axes.set(xlabel=plot_labels_x['t'])
-save_path = config.PATH_SAVE+f"model_{param_name}.pgf"
-plt.savefig(config.PATH_SAVE+f"model_{param_name}.pgf")
+
+if sys.argv[-1] == 'slide':
+    save_path = config.PATH_SAVE+f"model_{param_name}_s.pgf"
+else:
+    save_path = config.PATH_SAVE+f"model_{param_name}.pgf"
+plt.savefig(save_path)
 
